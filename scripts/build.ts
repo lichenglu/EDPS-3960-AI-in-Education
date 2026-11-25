@@ -35,6 +35,7 @@ export async function buildGame(outDir = 'dist') {
     await cp(island + '/LICENSE', theme + '/license.txt');
     await cp('node_modules/naive-icons/LICENSE', theme + '/icons-license.txt');
     await cp('node_modules/@rc-component/tour/LICENSE', theme + '/tour-license.txt');
+    await cp('node_modules/p5/license.txt', staging + '/assets/p5-license.txt');
     await cp('public/activities', staging + '/activities', { recursive: true });
     await cp('public/studio', staging + '/studio', { recursive: true });
     const handout = await Bun.build({

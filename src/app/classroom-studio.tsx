@@ -1,45 +1,50 @@
-import { LanguageSelect } from '@/components/LanguageSelect';
+import { QuestMasthead } from '@/components/QuestMasthead';
 import { useEffect, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { type StudioCheckpoint, type StudioConfig, studioPath } from '@/contracts/studio';
+import { type StudioCheckpoint, studioPath } from '@/contracts/studio';
 import type { Access } from '@/contracts/session';
+import { usePreviewConfig } from '@/features/identity/api/preview';
 import { AccessGate } from '@/features/identity/components/AccessGate';
 import { Studio } from '@/features/quests/week-one/studio/Studio';
 import { I18nProvider, useI18n } from '@/lib/i18n/I18n';
 import { courseTopic } from '@/curriculum/locales';
 import { questPrintPath } from '@/curriculum/print-route';
 import { api } from '@/lib/api-client';
+import { QuestAccess } from './routes/QuestAccess';
 
 const preview = new URLSearchParams(location.search).get('preview') === 'instructor';
 
 function Entrance({ children }: { children: ReactNode }) {
   const { t, href, locale } = useI18n();
   return (
-    <main id="studio-main" tabIndex={-1} className="studio-entrance">
-      <header className="studio-heading">
-        <a className="brand" href={href('/')}>
-          {t('courseName')}
-        </a>
-        <LanguageSelect />
-      </header>
-      <section className="paper studio-access">
-        <h1>
-          {t('weekTopic', { number: 1, topic: courseTopic({ id: 'w01', topic: 'AI literacy' }, locale) })}
-        </h1>
-        {children}
-        <a
-          href={href(questPrintPath('w01'))}
-          target={window.self === window.top ? undefined : '_blank'}
-          rel="noopener"
-        >
-          {t('printHandout')}
-        </a>
-        {window.self !== window.top && (
-          <a href={href(location.pathname)} target="_blank" rel="noopener">
-            {t('weekOneNewTab')}
-          </a>
-        )}
-      </section>
+    <main id="studio-main" tabIndex={-1} className="quest-frame">
+      <QuestMasthead
+        week={1}
+        title={courseTopic({ id: 'w01', topic: 'AI Literacy' }, locale)}
+        tools={
+          <>
+            <a
+              className="text"
+              href={href(questPrintPath('w01'))}
+              target={window.self === window.top ? undefined : '_blank'}
+              rel="noopener"
+            >
+              {t('printHandout')}
+            </a>
+            {window.self !== window.top && (
+              <a
+                className="text"
+                href={href(location.pathname + location.search)}
+                target="_blank"
+                rel="noopener"
+              >
+                {t('weekOneNewTab')}
+              </a>
+            )}
+          </>
+        }
+      />
+      <QuestAccess>{children}</QuestAccess>
     </main>
   );
 }
@@ -95,30 +100,14 @@ function ConnectedStudio({
 
 function StudioApp() {
   const { t } = useI18n();
-  const [config, setConfig] = useState<StudioConfig>();
-  const [failed, setFailed] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    let active = true;
-    setFailed(false);
-    void api<StudioConfig>(studioPath + '/config')
-      .then((value) => {
-        if (active) setConfig(value);
-      })
-      .catch(() => {
-        if (active) setFailed(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
+  const { config, failed, retry } = usePreviewConfig();
 
   if (!config)
     return (
       <Entrance>
         <p role="status">{failed ? t('studioUnavailable') : t('openingStudio')}</p>
         {failed && (
-          <button className="quiet" onClick={() => setAttempt((value) => value + 1)}>
+          <button className="quiet" onClick={retry}>
             {t('retry')}
           </button>
         )}

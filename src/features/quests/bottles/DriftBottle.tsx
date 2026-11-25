@@ -4,12 +4,17 @@ import { getBottles, sendBottle, replyToBottle, type Exchange } from '../api/bot
 import { clearTabDraft, TextEntry, useTabDraft } from '@/components/TextEntry';
 import type { Entry } from '@/game/quest-state';
 
+type ReflectionProps =
+  | { includeReflection?: true; entry: Entry; onEntry: (entry: Entry) => void }
+  | { includeReflection: false; entry?: never; onEntry?: never };
+
 export function DriftBottle({
   token,
   id,
   fallback,
   entry,
   onEntry,
+  includeReflection = true,
   disabled: busy,
   review = false,
   draftKey,
@@ -17,12 +22,10 @@ export function DriftBottle({
   token: string;
   id: string;
   fallback: string;
-  entry: Entry;
-  onEntry: (entry: Entry) => void;
   disabled: boolean;
   review?: boolean;
   draftKey?: string;
-}) {
+} & ReflectionProps) {
   const disabled = busy || review;
   const [exchange, setExchange] = useState<Exchange>();
   const shelfKey = review ? undefined : draftKey;
@@ -31,7 +34,8 @@ export function DriftBottle({
   const opened = openedId === target;
   const noteKey = shelfKey && shelfKey + '.bottle';
   const replyKey = shelfKey && shelfKey + '.reply.' + target;
-  const reflectionKey = shelfKey && shelfKey + '.reflection';
+  const reflectionKey = includeReflection && shelfKey ? shelfKey + '.reflection' : undefined;
+  const reflection = includeReflection ? entry?.reflection : undefined;
   const [notice, setNotice] = useState('');
   const [running, setRunning] = useState(false);
   async function request(operation = () => getBottles(token, id), success = '') {
@@ -56,8 +60,8 @@ export function DriftBottle({
   useEffect(() => {
     if (exchange?.own) clearTabDraft(noteKey);
     if (exchange?.responded) clearTabDraft(replyKey);
-    if (entry.reflection) clearTabDraft(reflectionKey);
-  }, [exchange?.own, exchange?.responded, entry.reflection, noteKey, replyKey, reflectionKey]);
+    if (reflection) clearTabDraft(reflectionKey);
+  }, [exchange?.own, exchange?.responded, reflection, noteKey, replyKey, reflectionKey]);
 
   return (
     <div className="drift">
@@ -132,7 +136,7 @@ export function DriftBottle({
               }
             />
           )}
-          {exchange.responded && !entry.reflection && (
+          {exchange.responded && onEntry && !reflection && (
             <TextEntry
               readOnly={review}
               draftKey={reflectionKey}
@@ -144,10 +148,10 @@ export function DriftBottle({
           )}
         </>
       )}
-      {entry.reflection && (
+      {reflection && (
         <div className="feedback">
           <strong>Private reflection</strong>
-          <p>{entry.reflection}</p>
+          <p>{reflection}</p>
         </div>
       )}
       <p className="notice" role="status">

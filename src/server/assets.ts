@@ -16,8 +16,18 @@ export const contentTypes: Record<string, string> = {
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
   '.mp3': 'audio/mpeg',
+  '.mp4': 'video/mp4',
   '.vtt': 'text/vtt; charset=utf-8',
 };
+// Browser media players use a single byte range to probe and seek within an MP4.
+export function videoRange(value: string, size: number): [number, number] | null {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(value);
+  if (!match || (!match[1] && !match[2]) || size === 0) return null;
+  const start = match[1] ? Number(match[1]) : Math.max(0, size - Number(match[2]));
+  const end = match[1] && match[2] ? Math.min(size - 1, Number(match[2])) : size - 1;
+  return start <= end && start < size ? [start, end] : null;
+}
+
 export function frameOrigin(value: string): string {
   try {
     const url = new URL(value);

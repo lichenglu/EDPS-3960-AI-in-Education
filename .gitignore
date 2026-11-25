@@ -9,3 +9,9 @@
 /playwright-report/
 /.build-*/
 .DS_Store
+
+# Generated authoring output and private narration inputs
+/art/week-two-film/audio/
+/art/week-two-film/renders/
+/art/week-two-film/viewer.html
+/scripts/chpc/__pycache__/

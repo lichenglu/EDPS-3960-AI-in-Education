@@ -1,0 +1,9 @@
+# Water under the door
+
+An illustrated book opens on a teacher listening to a student named Sam. As the instructor asks whether a computer could offer similar help, Sam appears at a screen. The next page opens to the story Sam reads about Mara and her brother. Rain falls along the angled grain of a night sky and collects against the door of their cottage. When the sill yields, a narrow band of reflected light crosses into the room. Each layer has its own speed and mass. The water should appear to enter a place that was dry a moment ago.
+
+The same slender shape changes jobs when the story passes to a reader. It becomes the edge of a paper strip and then a pencil line drawn under words. Keep the grain still while the material moves. Repeated seeded marks give the paint a rough edge without flickering across the lettering. Leave room around the words a student must actually read.
+
+Give movement a cause. A coat swings as Mara and her brother run. In the notebook the teacher’s question and Sam’s handwritten answer sit on facing pages. A shutter retracts to uncover a prepared response. Ink follows the words Sam marked. A conversational tutor asks why that clue matters. A slip of paper carries Sam’s explanation into the frame as the instructor reads it aloud.
+
+In the middle of the film, five margin notes guide the eye to the evidence. Each leader meets a detail on the page, then stays in place while the music plays. The lower fifth belongs to the spoken captions. Cut on the recorded phrases. The camera follows the object that carries the thought, and one action is visible before another competes with it. At the close, the page joins the archive. A bank of drawers gives a sense of how much remains to discover. Its contents stay inside until the student begins the investigation.

@@ -1,13 +1,13 @@
 @import url('/assets/island/index.css');
 @font-face {
-  font-family: 'Nunito Variable';
+  font-family: 'Course Nunito';
   font-weight: 200 1000;
   font-style: normal;
   font-display: swap;
   src: url('/assets/fonts/nunito.woff2') format('woff2');
 }
 :root {
-  --animal-font-family: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
+  --animal-font-family: 'Course Nunito', ui-rounded, system-ui, sans-serif;
   font-family: var(--animal-font-family);
   color: var(--ink);
   background: #efe7d2;
@@ -80,7 +80,8 @@ h3 {
   line-height: 1.13;
   font-weight: 940;
 }
-h1 {
+h1,
+.studio-section-title {
   font-size: clamp(2rem, 5vw, 3.65rem);
   letter-spacing: -0.04em;
 }
@@ -145,45 +146,10 @@ textarea {
   width: 100%;
   min-height: 72px;
 }
-.masthead,
-main,
-footer {
+main {
   width: min(94%, 1250px);
   margin-inline: auto;
 }
-.masthead {
-  --toolbar-inline-padding: 0.9rem;
-  display: grid;
-  gap: 0.5rem;
-  padding-block-end: 0.75rem;
-}
-.brand {
-  justify-self: start;
-  color: var(--title);
-  font-size: 1.1rem;
-  font-weight: 900;
-  text-decoration: none;
-}
-.masthead > .brand {
-  margin-inline-start: calc(var(--toolbar-inline-padding) + 1px);
-}
-.brand:hover {
-  text-decoration: underline;
-}
-.studio-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  padding: 0.65rem var(--toolbar-inline-padding);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-}
-.studio-toolbar-main,
-.masthead nav,
-.top-controls,
 .options,
 .inline,
 .tool-top,
@@ -194,52 +160,13 @@ footer {
   align-items: center;
   flex-wrap: wrap;
 }
-.studio-toolbar-main {
-  gap: 0.75rem;
-}
-/* Reserve the folded tails in the ribbon's height for flex alignment. */
-.studio-week-ribbon {
-  margin-inline: 0.6em;
-  padding-block-end: 0.35em;
-  font: 900 1rem/1 var(--animal-font-family);
-  white-space: nowrap;
-}
-.studio-week-ribbon span {
-  color: var(--ink);
-}
-.top-controls label,
 .setting {
   display: flex;
   align-items: center;
   gap: 8px;
   min-height: 44px;
-}
-.setting {
   padding: 3px 0;
 }
-.top-controls {
-  gap: 0.15rem 0.45rem;
-}
-.top-controls > .language-select {
-  margin-inline-start: auto;
-}
-.top-controls label {
-  color: var(--ink);
-  font-weight: 800;
-}
-.top-controls input {
-  accent-color: var(--moss);
-}
-.studio-toolbar .text {
-  padding-inline: 0.9rem;
-  color: var(--moss);
-  text-decoration: none;
-}
-.studio-toolbar .text:hover {
-  background: #e6eee0;
-  text-decoration: underline;
-}
-.studio-toolbar :focus-visible,
 .ideas-intro :focus-visible {
   outline-color: var(--keyline);
 }
@@ -304,7 +231,7 @@ footer {
   gap: 0.4rem 1rem;
   padding: 0.55rem clamp(0.85rem, 2vw, 1.45rem);
 }
-.room-intro h1 {
+.room-intro .studio-section-title {
   font-size: clamp(1.35rem, 2.2vw, 1.78rem);
   letter-spacing: -0.025em;
 }
@@ -405,7 +332,7 @@ footer {
   align-self: start;
   gap: 1.2rem;
 }
-.ideas-heading h1 {
+.ideas-heading .studio-section-title {
   max-width: 15ch;
   font-size: clamp(2rem, 4.2vw, 3.35rem);
   text-wrap: balance;
@@ -413,7 +340,7 @@ footer {
 .ideas-heading p {
   max-width: 39ch;
 }
-.ideas-heading h1:focus {
+.ideas-heading .studio-section-title:focus {
   outline: none;
 }
 .ideas-list {
@@ -1202,14 +1129,6 @@ summary {
   display: grid;
   gap: 8px;
 }
-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.9rem;
-  padding: 0.42rem 0 0.52rem;
-  font-size: 0.84rem;
-  color: #62523d;
-}
 dialog {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -1235,20 +1154,6 @@ dialog::backdrop {
   border: 0;
 }
 @media (max-width: 590px) {
-  .masthead {
-    --toolbar-inline-padding: 0.65rem;
-    gap: 0.4rem;
-  }
-  .studio-toolbar {
-    padding-block: 0.55rem;
-  }
-  .studio-toolbar-main,
-  .masthead nav {
-    gap: 0.35rem;
-  }
-  .top-controls {
-    gap: 0 0.2rem;
-  }
   .world-controls p {
     font-size: 0.83rem;
   }
@@ -1318,7 +1223,7 @@ dialog::backdrop {
   .studio-room .room-intro {
     gap: 0.35rem 0.5rem;
   }
-  .studio-room .room-intro h1 {
+  .studio-room .room-intro .studio-section-title {
     font-size: 1.2rem;
   }
   .studio-room .desk-list .quiet {
@@ -1382,23 +1287,6 @@ dialog::backdrop {
   flex: 1;
   width: 100%;
 }
-#root .studio-entrance {
-  gap: 1rem;
-}
-#root .studio-entrance > .studio-access {
-  flex: 0 0 auto;
-  width: min(100%, 34rem);
-  margin: auto;
-  padding: clamp(1rem, 4vw, 2.25rem);
-  display: grid;
-  gap: 1rem;
-}
-.studio-access .login,
-.studio-access .login form {
-  display: grid;
-  gap: 0.65rem;
-}
-.studio-access .actions,
 .studio-save {
   display: flex;
   align-items: center;
@@ -1411,14 +1299,6 @@ dialog::backdrop {
 .studio-save {
   color: var(--moss);
   font-size: 0.9rem;
-}
-
-.studio-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  flex-wrap: wrap;
 }
 
 .studio-lesson-material {

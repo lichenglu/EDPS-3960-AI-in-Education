@@ -1,0 +1,53 @@
+.w02-film {
+  margin-inline: auto;
+  width: min(100%, 60rem);
+}
+.w02-film-introduction :is(h2, h3) {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  line-height: 1.12;
+}
+.w02-film-introduction {
+  display: grid;
+  align-content: start;
+  gap: 0.65rem;
+  margin-bottom: 0.9rem;
+}
+.w02-film-introduction p {
+  margin: 0;
+  max-width: 65ch;
+  line-height: 1.45;
+}
+.w02-film summary {
+  cursor: pointer;
+  width: fit-content;
+  padding: 0.35rem 0;
+  font-weight: 700;
+}
+.w02-film details:first-of-type {
+  margin-top: 0.55rem;
+}
+.w02-film-action {
+  margin-top: 0.55rem;
+}
+
+/* Leave the same space for the desktop course footer as in the Week 1 room. */
+@media (min-width: 950px) {
+  .w02-film-player {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(18.5rem, 1.2fr) minmax(0, 2.8fr);
+    align-content: center;
+    align-items: start;
+    gap: 0 1.5rem;
+  }
+  .w02-film-player > :not(video) {
+    grid-column: 1;
+  }
+  .w02-film-player > video {
+    grid-column: 2;
+    grid-row: 1 / 5;
+    align-self: center;
+    max-height: max(16rem, calc(100dvh - 22rem));
+  }
+}

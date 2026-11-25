@@ -1,4 +1,6 @@
-import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { pipeline } from 'node:stream/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { extname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -10,15 +12,17 @@ import { hostedConfig } from './hosted-config.ts';
 import { studioStore } from './progress/studio.ts';
 import { studioTelemetry } from './telemetry.ts';
 import { studioPath, type StudioConfig } from '../contracts/studio.ts';
+import { weekTwoQuestId, weekTwoVersion } from '../contracts/week-two.ts';
 import { sessions, sessionProfile, isScriptedCourse } from './auth/session.ts';
 import { bottleRoutes } from './bottles/routes.ts';
 import { instructorRoutes } from './instructor/routes.ts';
-import { contentTypes, frameOrigin, publicRoute } from './assets.ts';
+import { contentTypes, frameOrigin, publicRoute, videoRange } from './assets.ts';
 import { body, json, problem, reject, RequestError } from './http.ts';
 import type { ActiveQuest, QuestCatalog } from './types.ts';
-import { getLegacy, summarize, validateState } from './progress/legacy.ts';
+import { readProgress, summarize, validateState } from './progress/legacy.ts';
 import { parseAction } from './progress/actions.ts';
 import { weekOneStore } from './progress/week-one.ts';
+import { parseWeekTwoAction, weekTwoStore } from './progress/week-two.ts';
 import { weekFiveFeedback } from './progress/feedback.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -72,7 +76,17 @@ export function createGameServer({
     return { ...quest, steps: quest.steps };
   }
   const week = questCatalog.w01?.steps?.length ? weekOneStore(db, currentQuest('w01')) : null;
+  const timelineQuest = questCatalog[weekTwoQuestId];
+  const timeline =
+    timelineQuest?.steps?.length && String(timelineQuest.version) === weekTwoVersion
+      ? weekTwoStore(db)
+      : null;
   const { getBottles, handleBottle } = bottleRoutes(db, currentQuest, async (id, account) => {
+    if (id === weekTwoQuestId) {
+      if (!(await timeline?.progress(account.id))?.state.replayComplete)
+        reject(403, 'Complete the replay before opening the class exchange.');
+      return;
+    }
     if (id !== 'w01') return;
     const index = currentQuest(id).steps.findIndex((step) => step.type === 'bottle');
     if (!week || index < 0 || (await week.progress(account.id)).state.index < index)
@@ -144,6 +158,23 @@ export function createGameServer({
     }
     const actionRoute = /^\/api\/v1\/quests\/([^/]+)\/(progress|actions)$/.exec(path);
     if (actionRoute) {
+      if (actionRoute[1] === weekTwoQuestId && timeline) {
+        if (actionRoute[2] === 'progress' && method === 'GET')
+          return json(response, 200, await timeline.progress(account.id));
+        if (actionRoute[2] !== 'actions' || method !== 'POST')
+          reject(405, 'Use the supported method for this quest action.');
+        const action = parseWeekTwoAction(await body(request));
+        const shouldRecord = production && !isScriptedCourse(account.course_id);
+        try {
+          const saved = await timeline.commit(account.id, action);
+          if (shouldRecord) saved.events.forEach(telemetry.record);
+          return json(response, 200, saved.checkpoint);
+        } catch (error) {
+          if (shouldRecord && !(error instanceof RequestError))
+            telemetry.record({ week: weekTwoQuestId, name: 'checkpoint_save_failed' });
+          throw error;
+        }
+      }
       if (actionRoute[1] !== 'w01' || !week) reject(404, 'This quest has no versioned activities.');
       if (actionRoute[2] === 'progress' && method === 'GET')
         return json(response, 200, await week.progress(account.id));
@@ -159,10 +190,12 @@ export function createGameServer({
     const progressMatch = /^\/api\/progress\/(w\d{2})$/.exec(path);
     if (progressMatch && (method === 'GET' || method === 'PUT')) {
       const questId = progressMatch[1];
+      if (questId === weekTwoQuestId)
+        reject(410, 'Open the current Week 2 quest to read or save a checkpoint.', 'snapshot-writes-retired');
       const quest = currentQuest(questId);
       const version = questId === 'w01' ? '1' : String(quest.version);
       const readSaved = async () => {
-        const record = await getLegacy(db, account.id, questId, version);
+        const record = await readProgress(db, account.id, questId, version);
         return questId === 'w05' && record.state?.entries['independent-design']?.first
           ? { ...record, unlocked: { feedback: weekFiveFeedback } }
           : record;
@@ -265,6 +298,26 @@ export function createGameServer({
     const [file, status] = publicRoute(questCatalog, path, staticDir);
     if (file) {
       try {
+        if (extname(file) === '.mp4') {
+          const { size } = await stat(file);
+          const requested = request.headers.range;
+          const range = requested ? videoRange(requested, size) : null;
+          response.setHeader('Accept-Ranges', 'bytes');
+          if (requested && !range) {
+            response.writeHead(416, { 'Content-Range': 'bytes */' + size });
+            return response.end();
+          }
+          const [start, end] = range ?? [0, size - 1];
+          if (range) response.setHeader('Content-Range', `bytes ${start}-${end}/${size}`);
+          response.writeHead(range ? 206 : 200, {
+            'Content-Type': 'video/mp4',
+            'Content-Length': end - start + 1,
+            'Cache-Control': 'no-cache',
+          });
+          if (request.method === 'HEAD' || size === 0) return response.end();
+          await pipeline(createReadStream(file, { start, end }), response);
+          return;
+        }
         const content = await readFile(file);
         response.writeHead(status, {
           'Content-Type': contentTypes[extname(file)],

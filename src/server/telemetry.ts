@@ -1,12 +1,22 @@
 import { randomUUIDv7 } from 'bun';
 import { randomUUID } from 'node:crypto';
 import { studioQuestId, studioVersion, type StudioMission } from '../contracts/studio.ts';
+import { weekTwoQuestId, weekTwoVersion } from '../contracts/week-two.ts';
+import type { WeekTwoMilestoneId } from '../curriculum/week-02/lesson.ts';
 
 export type StudioEvent =
   | { name: 'week_started' | 'week_completed' | 'checkpoint_save_failed' }
   | { name: 'mission_completed'; mission: StudioMission };
-export type RecordStudioEvent = (event: StudioEvent) => void;
-type TelemetryOptions = { token?: string; host?: string; fetchImpl?: typeof fetch };
+export type WeekTwoEvent = { week: typeof weekTwoQuestId } & (
+  | { name: 'week_started' | 'week_completed' | 'checkpoint_save_failed' }
+  | { name: 'mission_completed'; mission: WeekTwoMilestoneId }
+);
+type CourseEvent = StudioEvent | WeekTwoEvent;
+type TelemetryOptions = {
+  token?: string;
+  host?: string;
+  fetchImpl?: (url: string, init: RequestInit) => Promise<Response>;
+};
 
 export function studioTelemetry({
   token,
@@ -17,10 +27,10 @@ export function studioTelemetry({
   const flush = async () => {
     await Promise.all(pending);
   };
-  if (!token) return { record: (_event: StudioEvent) => {}, flush };
+  if (!token) return { record: (_event: CourseEvent) => {}, flush };
   const endpoint = host + '/i/v1/analytics/events';
 
-  const record: RecordStudioEvent = (event) => {
+  const record = (event: CourseEvent) => {
     if (pending.size >= 25) return;
     // Each event has a fresh, unlinkable ID. Only categorical fields cross this boundary.
     const timestamp = new Date().toISOString();
@@ -32,8 +42,8 @@ export function studioTelemetry({
       options: { process_person_profile: false },
       properties: {
         $geoip_disable: true,
-        week: studioQuestId,
-        version: studioVersion,
+        week: 'week' in event ? weekTwoQuestId : studioQuestId,
+        version: 'week' in event ? weekTwoVersion : studioVersion,
         ...(event.name === 'mission_completed' && { mission: event.mission }),
       },
     };

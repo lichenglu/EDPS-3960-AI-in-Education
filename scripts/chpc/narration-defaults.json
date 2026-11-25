@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "engine": "cosyvoice3",
+  "model_id": "FunAudioLLM/Fun-CosyVoice3-0.5B-2512",
+  "model_revision": "29e01c4e8d000f4bcd70751be16fa94bf3d85a18",
+  "instruct": "Speak in a clear, relaxed conversational voice. Preserve the reference speaker’s tone and vocal identity. Use natural pauses and a pace suitable for an instructional video.",
+  "seed": 3960,
+  "sample_rate": 24000,
+  "resources": {
+    "gpu_type": "h200_1g.18gb",
+    "host_memory": "32G",
+    "cpus": 4,
+    "time_limit": "00:30:00"
+  }
+}

@@ -1,4 +1,6 @@
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -7,7 +9,11 @@ import { isWeekOneStudioPath, weekOneStudioPage } from './src/curriculum/studio-
 import { frameOrigin } from './src/server/assets.ts';
 
 const project = fileURLToPath(new URL('.', import.meta.url));
-const cacheRoot = resolve(project, '.vite');
+const cacheRoot = resolve(
+  tmpdir(),
+  'the-next-move-vite',
+  createHash('sha256').update(project).digest('hex').slice(0, 12),
+);
 const handout = '/activities/w01.html';
 const handoutEntry =
   '/@fs' + normalizePath(resolve(project, 'src/features/quests/week-one/sources/handout.ts'));
@@ -21,7 +27,7 @@ const framePolicy = ["frame-ancestors 'self'", ...origins].join(' ');
 
 export default defineConfig({
   root: resolve(project, 'src/app'),
-  // Package installs can replace node_modules while a preview is running.
+  // Keep generated dependencies outside installed packages and cloud sync.
   cacheDir: resolve(cacheRoot, 'preview-' + (process.env.GAME_PORT ?? '4173')),
   publicDir: resolve(project, 'public'),
   plugins: [

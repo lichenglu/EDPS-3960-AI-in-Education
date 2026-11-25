@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { weekTwoIntroFilm } from '../../src/curriculum/week-02/intro-films';
 
 test('each week links to a printable page and published handouts work without signing in', async ({
   page,
@@ -68,6 +69,31 @@ test('each week links to a printable page and published handouts work without si
   );
 
   await page.goto('/quests/w02/print?lang=en');
+  await expect(page.getByRole('heading', { name: 'Week 2 · History of AI in education' })).toBeVisible();
+  const intro = page
+    .locator('section.print-stage')
+    .filter({ has: page.getByRole('heading', { name: /^I Do/ }) });
+  await expect(intro.getByText(weekTwoIntroFilm.guidingQuestion, { exact: true })).toBeVisible();
+  for (const scene of weekTwoIntroFilm.scenes) {
+    await expect(intro).toContainText(scene.lines.join(' '));
+    await expect(intro.getByText(scene.description, { exact: true })).toBeVisible();
+  }
+  await expect(intro.locator('video, .print-writing-space')).toHaveCount(0);
+  const guided = page
+    .locator('section.print-stage')
+    .filter({ has: page.getByRole('heading', { name: /^We Do/ }) });
+  await expect(guided.getByRole('heading', { name: '1958', exact: true })).toBeVisible();
+  await expect(guided.getByRole('heading', { name: '1970', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /1995.*Cognitive Tutors/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /20\?\?/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Success criteria' })).toBeVisible();
+  await expect(page.locator('a[href*="10.1007/s40593-022-00313-2"]').first()).toBeVisible();
+  await expect(page.getByLabel('Access code')).toHaveCount(0);
+  expect(await page.locator('html').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+    true,
+  );
+
+  await page.goto('/quests/w03/print?lang=en');
   await expect(page.getByRole('heading', { name: 'Syllabus summary' })).toBeVisible();
   await expect(page.getByText('This week’s activity handout is in development.')).toBeVisible();
 });

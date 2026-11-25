@@ -1,0 +1,136 @@
+[
+  {
+    "id": "orientation",
+    "frames": 350,
+    "cues": [
+      {
+        "start": 0.85,
+        "end": 4.49
+      },
+      {
+        "start": 5.01,
+        "end": 7.37
+      },
+      {
+        "start": 7.89,
+        "end": 12.41
+      }
+    ]
+  },
+  {
+    "id": "flood",
+    "frames": 161,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 2.38
+      },
+      {
+        "start": 2.9,
+        "end": 4.54
+      }
+    ]
+  },
+  {
+    "id": "escape",
+    "frames": 193,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 3.06
+      },
+      {
+        "start": 3.58,
+        "end": 5.86
+      }
+    ]
+  },
+  {
+    "id": "answer",
+    "frames": 231,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 2.74
+      },
+      {
+        "start": 3.26,
+        "end": 5.9
+      }
+    ]
+  },
+  {
+    "id": "shutter",
+    "frames": 239,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 3.38
+      },
+      {
+        "start": 3.9,
+        "end": 6.22
+      }
+    ]
+  },
+  {
+    "id": "model",
+    "frames": 267,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 3.46
+      },
+      {
+        "start": 3.98,
+        "end": 7.38
+      }
+    ]
+  },
+  {
+    "id": "clue",
+    "frames": 213,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 2.7
+      },
+      {
+        "start": 3.22,
+        "end": 5.18
+      }
+    ]
+  },
+  {
+    "id": "conversation",
+    "frames": 316,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 2.98
+      },
+      {
+        "start": 3.5,
+        "end": 5.9
+      },
+      {
+        "start": 6.42,
+        "end": 9.42
+      }
+    ]
+  },
+  {
+    "id": "archive",
+    "frames": 190,
+    "cues": [
+      {
+        "start": 0.38,
+        "end": 2.34
+      },
+      {
+        "start": 2.86,
+        "end": 5.74
+      }
+    ]
+  }
+]

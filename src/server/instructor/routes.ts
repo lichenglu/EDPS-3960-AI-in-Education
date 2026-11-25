@@ -1,4 +1,6 @@
 import type { Database } from '../database.ts';
+import { weekTwoQuestId } from '../../contracts/week-two.ts';
+import { summarizeWeekTwo } from '../progress/week-two.ts';
 import { studioQuestId, studioVersion } from '../../contracts/studio.ts';
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -22,12 +24,17 @@ export function instructorRoutes(db: Database, questCatalog: QuestCatalog) {
       `,
         )
         .all(account.course_id);
-      const accountProgress = db.query<StageRow, [string]>(`
-        SELECT quest_id, quest_version, stage_status FROM progress WHERE account_id = ?
+      const accountProgress = db.query<
+        StageRow & { timeline: string | null; saved: string },
+        [string, string]
+      >(`
+        SELECT quest_id, quest_version, stage_status, last_saved AS saved,
+          CASE WHEN quest_id = ? THEN state END AS timeline
+        FROM progress WHERE account_id = ?
       `);
       const roster = await Promise.all(
         learners.map(async (learner) => {
-          const rows = await accountProgress.all(learner.id);
+          const rows = await accountProgress.all(weekTwoQuestId, learner.id);
           const studio = rows.find(
             (row) => row.quest_id === studioQuestId && row.quest_version === studioVersion,
           );
@@ -40,7 +47,13 @@ export function instructorRoutes(db: Database, questCatalog: QuestCatalog) {
                     Object.hasOwn(questCatalog, row.quest_id) &&
                     String(questCatalog[row.quest_id].version) === row.quest_version,
                 )
-                .map((row) => [row.quest_id, JSON.parse(row.stage_status)]),
+                .map((row) => [
+                  row.quest_id,
+                  // Derive the current stage for records saved when the first two years belonged to I Do.
+                  row.timeline
+                    ? summarizeWeekTwo(JSON.parse(row.timeline), row.saved)
+                    : JSON.parse(row.stage_status),
+                ]),
             ),
             ...(studio && { studioProgress: JSON.parse(studio.stage_status) }),
           };

@@ -1,0 +1,22 @@
+.quest-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.9rem;
+  width: min(94%, 1250px);
+  margin-inline: auto;
+  padding: 0.42rem 0 0.52rem;
+  color: #62523d;
+  font:
+    650 0.84rem/1.52 'Course Nunito',
+    ui-rounded,
+    system-ui,
+    sans-serif;
+}
+.quest-frame .quest-footer {
+  width: 100%;
+}
+.quest-footer a {
+  color: #1a6350;
+  text-underline-offset: 3px;
+}

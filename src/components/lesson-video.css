@@ -1,0 +1,75 @@
+.lesson-video {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #0d202b;
+  border-radius: 0.6rem;
+}
+.lesson-video-transcript {
+  min-width: 0;
+  margin-top: 0.55rem;
+}
+.lesson-video-transcript summary {
+  cursor: pointer;
+  width: fit-content;
+  padding: 0.35rem 0;
+  font-weight: 700;
+}
+.lesson-video-script {
+  max-width: 70ch;
+}
+.lesson-video-script p {
+  margin: 0;
+}
+.lesson-video-script > p + p {
+  margin-top: 0.8rem;
+}
+.lesson-video-scroll {
+  max-height: clamp(10rem, 24vh, 12rem);
+  max-width: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 0.25rem 0.6rem 0.25rem 0;
+}
+.lesson-video-scroll:focus-visible {
+  outline: 2px solid var(--color-keyline, #715632);
+  outline-offset: 3px;
+}
+.lesson-video-scroll .lesson-video-line {
+  display: block;
+  padding: 0.15rem 0.4rem;
+  border-inline-start: 3px solid transparent;
+}
+.lesson-video-line[aria-current='true'] {
+  border-inline-start-color: #0b6b62;
+  background: #d0ebdb;
+  color: #253d32;
+  font-weight: 800;
+}
+.lesson-video-description {
+  color: var(--color-cocoa-soft, #6a5743);
+}
+.lesson-video-scroll .lesson-video-description {
+  display: block;
+}
+.lesson-video-note {
+  display: block;
+  border-inline-start: 0.2rem solid #3a7771;
+  padding-inline-start: 0.6rem;
+  margin-top: 0.25rem;
+}
+.lesson-video-note strong {
+  margin-inline-end: 0.2rem;
+}
+@media print {
+  .lesson-video-scroll {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+}

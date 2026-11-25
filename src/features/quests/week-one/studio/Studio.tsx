@@ -1,11 +1,12 @@
 import { useI18n } from '@/lib/i18n/I18n';
 import { missionContent } from '@/curriculum/week-01/locales';
-import { LanguageSelect } from '@/components/LanguageSelect';
+import { courseTopic } from '@/curriculum/locales';
+import { QuestFooter } from '@/components/QuestFooter';
+import { QuestMasthead } from '@/components/QuestMasthead';
 import type { Access } from '@/contracts/session';
 import type { StudioCheckpoint, StudioState } from '@/contracts/studio';
 import { weekOneStudioPath } from '@/curriculum/studio-route';
 import { questPrintPath } from '@/curriculum/print-route';
-import { Title } from 'animal-island-ui';
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   ArrowLeftIcon,
@@ -102,7 +103,9 @@ function Hub({
     <section className="paper hub" aria-labelledby="hub-title">
       <div className="hub-heading">
         <div>
-          <h1 id="hub-title">{t('missionHub')}</h1>
+          <h2 id="hub-title" className="studio-section-title">
+            {t('missionHub')}
+          </h2>
           <p>{t('missionHubIntro')}</p>
         </div>
         <div className="balance" aria-label={t('balanceMeter')}>
@@ -281,9 +284,9 @@ function Room({
     <section className="studio-room paper" aria-labelledby="room-title">
       <div className="room-intro">
         <div>
-          <h1 id="room-title" tabIndex={-1}>
+          <h2 id="room-title" className="studio-section-title" tabIndex={-1}>
             {t('yourClassroom')}
-          </h1>
+          </h2>
           {story && <p>{t('openingSummary')}</p>}
         </div>
         <div hidden={!showRoomLinks}>
@@ -566,25 +569,21 @@ export function Studio({ account, preview = false, previewSignOut, localPreview 
 
   return (
     <StudioWork.Provider value={account ? { work, save: saveWork } : null}>
-      <header className="masthead">
-        <a className="brand" href={href('/')}>
-          {t('courseName')}
-        </a>
-        <div className="studio-toolbar">
-          <div className="studio-toolbar-main">
-            <Title className="studio-week-ribbon" color="app-yellow" size="small">
-              {t('week', { number: 1 })}
-            </Title>
-            <nav aria-label={t('studioNavigation')}>
-              <button className="quiet" aria-pressed={screen === 'room'} onClick={() => navigate('room')}>
-                {t('studio')}
-              </button>
-              <button className="quiet" aria-pressed={screen === 'hub'} onClick={() => navigate('hub')}>
-                {t('missionHub')}
-              </button>
-            </nav>
-          </div>
-          <div className="top-controls">
+      <QuestMasthead
+        week={1}
+        title={courseTopic({ id: 'w01', topic: 'AI Literacy' }, locale)}
+        navigation={
+          <nav aria-label={t('studioNavigation')}>
+            <button className="quiet" aria-pressed={screen === 'room'} onClick={() => navigate('room')}>
+              {t('studio')}
+            </button>
+            <button className="quiet" aria-pressed={screen === 'hub'} onClick={() => navigate('hub')}>
+              {t('missionHub')}
+            </button>
+          </nav>
+        }
+        tools={
+          <>
             {storyFinished && (
               <button className="text" type="button" onClick={showHowToPlay}>
                 {t('howToPlay')}
@@ -622,10 +621,9 @@ export function Studio({ account, preview = false, previewSignOut, localPreview 
                 {t('signOut')}
               </button>
             )}
-            <LanguageSelect />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
       <main id="studio-main" tabIndex={-1}>
         {account && (
           <div className="studio-save">
@@ -700,7 +698,7 @@ export function Studio({ account, preview = false, previewSignOut, localPreview 
               <MissionIcon id={missionId} />
               <div>
                 <p>{mission.idea}</p>
-                <h1>{mission.name}</h1>
+                <h2 className="studio-section-title">{mission.name}</h2>
               </div>
             </div>
             <p className="tool-goal">{mission.task}</p>
@@ -730,8 +728,7 @@ export function Studio({ account, preview = false, previewSignOut, localPreview 
           </article>
         )}
       </main>
-      <footer>
-        <a href={href('/')}>{t('allWeeks')}</a>
+      <QuestFooter>
         <a
           href={href(questPrintPath('w01'))}
           target={window.self === window.top ? undefined : '_blank'}
@@ -750,7 +747,7 @@ export function Studio({ account, preview = false, previewSignOut, localPreview 
         <a lang="en" href={studioReferences.udc.url} target="_blank" rel="noreferrer">
           {studioReferences.udc.label}
         </a>
-      </footer>
+      </QuestFooter>
       <dialog ref={dialog} aria-labelledby="reset-title">
         <h2 id="reset-title">{instructor ? t('resetPreviewQuestion') : t('resetProgressQuestion')}</h2>
         <p>{instructor ? t('resetPreviewNote') : t('resetProgressNote')}</p>

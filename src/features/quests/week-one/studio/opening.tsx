@@ -34,9 +34,9 @@ export function BigIdeasIntro({ begin }: { begin: () => void }) {
   return (
     <section className="paper ideas-intro" aria-labelledby="ideas-title">
       <div className="ideas-heading">
-        <h1 id="ideas-title" ref={heading} tabIndex={-1}>
+        <h2 id="ideas-title" className="studio-section-title" ref={heading} tabIndex={-1}>
           {t('fiveIdeas')}
-        </h1>
+        </h2>
         <p>{t('fiveIdeasDescription')}</p>
       </div>
       <figure className="ideas-wheel">

@@ -3,6 +3,8 @@ import { test } from 'node:test';
 import { courseCast } from '../src/curriculum/characters.ts';
 import { quests } from '../src/curriculum/index.ts';
 import { practiceEvidence, welcomeRequest } from '../src/curriculum/week-one.ts';
+import { weekTwoLesson, weekTwoYearIds } from '../src/curriculum/week-02/lesson.ts';
+import { weekTwoReferences } from '../src/curriculum/week-02/references.ts';
 import type { Quest, Stage, Step } from '../src/curriculum/index.ts';
 
 const stages: Stage[] = ['I Do', 'We Do', 'You Do'];
@@ -28,13 +30,13 @@ test('each instructional week has a stable syllabus entry', () => {
     assert.equal(quest.id, id);
     for (const key of ['title', 'topic', 'assignment'] as const) assert.ok(printable(quest[key]));
     assert.ok(Array.isArray(quest.steps));
-    assert.equal(quest.steps.length > 0, ['w01', 'w05'].includes(id));
+    assert.equal(quest.steps.length > 0, ['w01', 'w02', 'w05'].includes(id));
   }
   assert.match(requireQuest('w01').assignment, /Orientation check.*Jan 17/i);
   assert.match(requireQuest('w05').assignment, /Lab 2.*Feb 14/i);
 });
 
-for (const id of ['w01', 'w05']) {
+for (const id of ['w01', 'w02', 'w05']) {
   test(`${id} has ordered stages, defined choices, and a timed independent response`, () => {
     const quest = requireQuest(id);
     assert.ok(printable(quest.objective));
@@ -151,8 +153,36 @@ test('students can inspect three attributed record lines and follow the same inp
   assert.match(lab.prompt ?? '', /original/i);
 });
 
-test('the public curriculum excludes worked independent assessments for both quests', () => {
-  for (const quest of [requireQuest('w01'), requireQuest('w05')]) {
+test('Week 2 covers the proposed archive milestones and retains source and timing alignment', () => {
+  const week = requireQuest('w02');
+  assert.match(week.assignment, /Case note 1.*Jan 24/i);
+  assert.equal(week.minutes, 98);
+  assert.deepEqual(
+    week.steps.filter((step) => step.stage === 'I Do').map((step) => step.id),
+    ['archive-introduction'],
+  );
+  assert.ok(weekTwoLesson.milestones.every((milestone) => milestone.stage === 'We Do'));
+  assert.deepEqual(
+    weekTwoLesson.milestones.map(({ id }) => id),
+    [...weekTwoYearIds],
+  );
+  for (const stage of stages) {
+    assert.equal(
+      week.steps.filter((step) => step.stage === stage).reduce((sum, step) => sum + step.minutes, 0),
+      weekTwoLesson.stageMinutes[stage],
+    );
+  }
+  const sourceIds = new Set(weekTwoReferences.map(({ id }) => id));
+  for (const { sourceIds: sources, options } of weekTwoLesson.milestones) {
+    assert.ok(sources.length && sources.every((id) => sourceIds.has(id)));
+    assert.equal(options.filter((option) => option.best).length, 1);
+  }
+  assert.equal(weekTwoLesson.milestones.at(-1)?.revealPanels?.length, 2);
+  assert.equal(weekTwoLesson.replay.cards.length, 3);
+});
+
+test('the public curriculum excludes worked independent assessments', () => {
+  for (const quest of [requireQuest('w01'), requireQuest('w02'), requireQuest('w05')]) {
     const transfer = quest.steps.find((step) => step.independent);
     assert.ok(transfer);
     assert.equal(transfer.feedback, undefined);

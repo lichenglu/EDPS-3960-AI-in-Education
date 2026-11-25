@@ -1,0 +1,31 @@
+.w02-artifact {
+  position: relative;
+  height: clamp(8rem, 22vw, 14rem);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid #4f6e67;
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse at 53% 66%, #31666480, transparent 61%),
+    radial-gradient(#8db8aa26 1px, transparent 1px) 4px 6px / 13px 13px,
+    #0c242d;
+}
+
+.w02-artifact::after {
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid #68988e40;
+  border-radius: 4px;
+  content: '';
+  pointer-events: none;
+}
+
+.w02-artifact canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.w02-player[data-text-view='true'] .w02-artifact {
+  display: none;
+}

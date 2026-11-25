@@ -5,12 +5,16 @@ import { join } from 'node:path';
 import { Readable } from 'node:stream';
 import test, { type TestContext } from 'node:test';
 import { createGameServer } from '../src/server/index.ts';
-import { createPostgresDatabase } from '../src/server/database.ts';
+import { createDatabase, createPostgresDatabase } from '../src/server/database.ts';
 import { createLab } from '../src/server/lab/run.ts';
+import { digest } from '../src/server/auth/codes.ts';
+import { studioTelemetry } from '../src/server/telemetry.ts';
 import { studioMissionIds, studioPath, studioVersion, type StudioState } from '../src/contracts/studio.ts';
 import { Database } from 'bun:sqlite';
 import type { WeekOneIntent } from '../src/contracts/week-one.ts';
 import { quests } from '../src/curriculum/index.ts';
+import { weekTwoMilestones, weekTwoReplay } from '../src/curriculum/week-02/lesson.ts';
+import type { WeekTwoIntent } from '../src/contracts/week-two.ts';
 
 const questCatalog = {
   w05: {
@@ -113,6 +117,272 @@ function start(t: TestContext, options: Parameters<typeof createGameServer>[0] =
   };
   return { request, signIn, close: app.close };
 }
+
+test('requires an authenticated learner and a current version for Week 2 checkpoints', async (t) => {
+  const { request, signIn } = await start(t, { questCatalog: quests });
+  const progress = '/api/v1/quests/w02/progress';
+  const actions = '/api/v1/quests/w02/actions';
+  assert.equal((await request(progress)).status, 401);
+  assert.equal((await request(progress, { token: await signIn('DEMO-INSTRUCTOR') })).status, 403);
+  const token = await signIn('DEMO-LEARNER');
+  const initial = await request(progress, { token });
+  assert.equal(initial.status, 200);
+  assert.deepEqual(initial.value, {
+    questId: 'w02',
+    contentVersion: '1',
+    revision: 0,
+    lastSaved: null,
+    state: { introComplete: false, completedMilestones: [], replayComplete: false, futureComplete: false },
+  });
+  const move = {
+    actionId: 'intro',
+    expectedRevision: 0,
+    contentVersion: '1',
+    intent: { type: 'completeIntro' },
+  };
+  const stale = await request(actions, { method: 'POST', token, json: { ...move, contentVersion: '0' } });
+  assert.equal(stale.status, 409);
+  assert.equal(stale.value.type, '/problems/stale-content-version');
+  const saved = await request(actions, { method: 'POST', token, json: move });
+  assert.equal(saved.status, 200);
+  assert.equal(saved.value.revision, 1);
+  assert.equal(saved.value.state.introComplete, true);
+  assert.ok(saved.value.lastSaved);
+  assert.deepEqual((await request(actions, { method: 'POST', token, json: move })).value, saved.value);
+
+  const peer = await signIn('DEMO-PEER');
+  assert.deepEqual((await request(progress, { token: peer })).value, initial.value);
+  assert.deepEqual((await request(progress, { token: await signIn('DEMO-LEARNER') })).value, saved.value);
+
+  const first = weekTwoMilestones[0];
+  const competingSaves = await Promise.all(
+    first.options.slice(0, 2).map(({ id }) =>
+      request(actions, {
+        method: 'POST',
+        token,
+        json: {
+          actionId: 'concurrent-' + id,
+          contentVersion: '1',
+          expectedRevision: 1,
+          intent: { type: 'completeMilestone', milestoneId: first.id, choiceId: id },
+        },
+      }),
+    ),
+  );
+  assert.deepEqual(competingSaves.map(({ status }) => status).sort(), [200, 409]);
+  assert.equal(competingSaves.find(({ status }) => status === 409)?.value.type, '/problems/stale-revision');
+  assert.deepEqual((await request(progress, { token })).value.state.completedMilestones, [first.id]);
+});
+
+test('saves ordered Week 2 attempts, resumes the proposal, and reports stages to the instructor', async (t) => {
+  const events: unknown[] = [];
+  const database = createDatabase(':memory:');
+  const { request, signIn } = await start(t, {
+    database,
+    questCatalog: quests,
+    production: true,
+    telemetry: { record: (event) => events.push(event), flush: async () => {} },
+  });
+  const token = await signIn('DEMO-LEARNER');
+  const instructor = await signIn('DEMO-INSTRUCTOR');
+  const otherInstructor = await signIn('DEMO-OTHER-INSTRUCTOR');
+  const checkpoint = '/api/v1/quests/w02/progress';
+  const actions = '/api/v1/quests/w02/actions';
+  const bottles = '/api/v1/quests/w02/bottles';
+  const requestAction = (actionId: string, expectedRevision: number, intent: WeekTwoIntent) =>
+    request(actions, {
+      method: 'POST',
+      token,
+      json: { contentVersion: '1', actionId, expectedRevision, intent },
+    });
+  let revision = 0;
+  const advance = async (intent: WeekTwoIntent) => {
+    const saved = await requestAction('step-' + revision, revision, intent);
+    assert.equal(saved.status, 200, JSON.stringify(saved.value));
+    assert.equal(saved.value.revision, ++revision);
+    return saved.value;
+  };
+  const intro = { type: 'completeIntro' } as const;
+  const next = (position: number): WeekTwoIntent => ({
+    type: 'completeMilestone',
+    milestoneId: weekTwoMilestones[position].id,
+    choiceId: weekTwoMilestones[position].options.at(-1)!.id,
+  });
+  const replay = { type: 'completeReplay', choiceId: weekTwoReplay.options[0].id } as const;
+  const proposal = {
+    conceptId: 'teachable-agent',
+    humanDecisionId: 'teacher-sets-limits',
+    evidenceId: 'new-problem-alone',
+    rationale: 'The teacher sets the hint limit. The learner explains a new example independently.',
+  };
+  const future = { type: 'completeFuture', ...proposal } as const;
+  const summary = async () => {
+    const roster = await request('/api/v1/instructor/roster', { token: instructor });
+    return roster.value.learners.find(({ id }: { id: string }) => id === 'demo-1').progress.w02;
+  };
+
+  assert.equal((await request('/api/progress/w02', { token })).status, 410);
+  assert.equal((await request('/api/progress/w02', { token, method: 'PUT', json: {} })).status, 410);
+  assert.equal((await requestAction('early', revision, next(0))).status, 422);
+  const entered = await advance(intro);
+  const guided = {
+    stage: 'We Do',
+    stages: { 'I Do': 'complete', 'We Do': 'in-progress', 'You Do': 'not-started' },
+    complete: false,
+    lastSaved: entered.lastSaved,
+  };
+  assert.deepEqual(await summary(), guided);
+  // Older version-1 summaries counted 1958 and 1970 toward the introductory stage.
+  await database.run(
+    'UPDATE progress SET stage_status = ? WHERE account_id = ? AND quest_id = ? AND quest_version = ?',
+    JSON.stringify({
+      ...guided,
+      stage: 'I Do',
+      stages: { ...guided.stages, 'I Do': 'in-progress', 'We Do': 'not-started' },
+    }),
+    'demo-1',
+    'w02',
+    '1',
+  );
+  assert.deepEqual(await summary(), guided);
+  assert.deepEqual((await request(checkpoint, { token })).value, entered);
+  assert.equal((await requestAction('stale', 0, next(0))).value.type, '/problems/stale-revision');
+  assert.equal((await requestAction('skip', revision, next(1))).status, 422);
+  assert.equal((await requestAction('early-replay', revision, replay)).status, 422);
+  assert.equal((await request(bottles, { token })).status, 403);
+
+  for (const [position, milestone] of weekTwoMilestones.entries()) {
+    const invalid = await requestAction('unknown-' + position, revision, {
+      type: 'completeMilestone',
+      milestoneId: milestone.id,
+      choiceId: 'unknown-choice',
+    });
+    assert.equal(invalid.status, 422);
+    const saved = await advance(next(position));
+    assert.deepEqual(
+      saved.state.completedMilestones,
+      weekTwoMilestones.slice(0, position + 1).map(({ id }) => id),
+    );
+  }
+  assert.equal((await summary()).stage, 'We Do');
+  assert.equal((await requestAction('early-future', revision, future)).status, 422);
+  await advance(replay);
+  assert.equal((await summary()).stage, 'You Do');
+  assert.equal((await request(bottles, { token })).status, 200);
+
+  assert.equal(
+    (await requestAction('wrong-design', revision, { ...future, evidenceId: 'unknown' })).status,
+    422,
+  );
+  assert.equal((await requestAction('empty-design', revision, { ...future, rationale: '  ' })).status, 400);
+  const finished = await advance({ ...future, rationale: '  ' + proposal.rationale + ' ' });
+  assert.deepEqual(finished.state.futureProposal, proposal);
+  assert.equal(finished.state.futureComplete, true);
+  assert.deepEqual((await request(checkpoint, { token })).value, finished);
+  assert.deepEqual((await requestAction('step-0', 0, intro)).value, finished);
+  assert.equal((await requestAction('step-0', revision, future)).value.type, '/problems/action-id-reused');
+  assert.equal(
+    (await requestAction('amend', revision, { ...future, rationale: 'Try a different design.' })).value.type,
+    '/problems/first-attempt-sealed',
+  );
+  assert.deepEqual(await summary(), {
+    stage: null,
+    stages: { 'I Do': 'complete', 'We Do': 'complete', 'You Do': 'complete' },
+    complete: true,
+    lastSaved: finished.lastSaved,
+  });
+  const bottle = await request(bottles, { token, method: 'POST', json: { text: 'Check the next step.' } });
+  assert.equal(bottle.status, 200);
+  assert.equal(bottle.value.next, null);
+  const exampleReply = await request('/api/bottles/w02/reply', {
+    token,
+    method: 'POST',
+    json: { bottleId: null, text: 'What would a fresh problem show?' },
+  });
+  assert.equal(exampleReply.status, 200);
+  assert.equal(exampleReply.value.responded, true);
+  const peer = await signIn('DEMO-PEER');
+  const peerActivities = [intro, ...weekTwoMilestones.map((_, index) => next(index)), replay];
+  for (const [index, intent] of peerActivities.entries()) {
+    const saved = await request(actions, {
+      method: 'POST',
+      token: peer,
+      json: { contentVersion: '1', actionId: `peer-${index}`, expectedRevision: index, intent },
+    });
+    assert.equal(saved.status, 200);
+  }
+  const peerBottle = await request(bottles, {
+    token: peer,
+    method: 'POST',
+    json: { text: 'Try a new problem.' },
+  });
+  assert.equal(peerBottle.value.next.id, bottle.value.own.id);
+  const peerReply = await request(`/api/v1/bottles/${bottle.value.own.id}/replies`, {
+    token: peer,
+    method: 'POST',
+    json: { text: 'Which next step would you watch for?' },
+  });
+  assert.equal(peerReply.status, 200);
+  assert.equal(
+    (await request(bottles, { token })).value.replies[0].text,
+    'Which next step would you watch for?',
+  );
+  const otherRoster = await request('/api/v1/instructor/roster', { token: otherInstructor });
+  assert.ok(otherRoster.value.learners.every(({ progress }: { progress: object }) => !('w02' in progress)));
+  assert.deepEqual(events, []);
+});
+
+test('emits only allowlisted Week 2 analytics for newly saved milestones', async (t) => {
+  const database = createDatabase(':memory:');
+  const code = 'SYNTHETIC-WEEK-TWO';
+  await database.run(
+    'INSERT INTO accounts VALUES (?, ?, ?, ?, ?)',
+    'student-test',
+    'production-course-test',
+    'learner',
+    'Private test label',
+    digest(code),
+  );
+  const received: { event: string; properties: Record<string, unknown>; distinct_id: string }[] = [];
+  const telemetry = studioTelemetry({
+    token: 'synthetic-analytics-token',
+    async fetchImpl(_input, init) {
+      const [event] = JSON.parse(String(init?.body)).batch;
+      received.push(event);
+      return Response.json({ results: { [event.uuid]: { result: 'ok' } } });
+    },
+  });
+  const { request, signIn } = await start(t, { database, production: true, questCatalog: quests, telemetry });
+  const token = await signIn(code);
+  const actions = '/api/v1/quests/w02/actions';
+  const post = (actionId: string, expectedRevision: number, intent: WeekTwoIntent) =>
+    request(actions, {
+      method: 'POST',
+      token,
+      json: { contentVersion: '1', actionId, expectedRevision, intent },
+    });
+
+  assert.equal((await post('intro-test', 0, { type: 'completeIntro' })).status, 200);
+  const first = weekTwoMilestones[0];
+  const attempt: WeekTwoIntent = {
+    type: 'completeMilestone',
+    milestoneId: first.id,
+    choiceId: first.options[0].id,
+  };
+  assert.equal((await post('first-year-test', 1, attempt)).status, 200);
+  assert.equal((await post('first-year-test', 1, attempt)).status, 200);
+  await telemetry.flush();
+  assert.deepEqual(
+    received.map(({ event, properties }) => [event, properties]),
+    [
+      ['week_started', { $geoip_disable: true, week: 'w02', version: '1' }],
+      ['mission_completed', { $geoip_disable: true, week: 'w02', version: '1', mission: first.id }],
+    ],
+  );
+  assert.notEqual(received[0].distinct_id, received[1].distinct_id);
+  assert.equal(JSON.stringify(received).includes('student-test'), false);
+  assert.equal(JSON.stringify(received).includes('Private test label'), false);
+});
 
 test('validates access codes, opaque sessions, roles, and roster boundaries', async (t) => {
   const { request, signIn } = await start(t);

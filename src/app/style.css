@@ -161,19 +161,14 @@ table {
   align-items: center;
   min-height: 44px;
 }
-.quest-heading,
-.quest-utilities,
 .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.7rem 1rem;
 }
-.quest-heading {
-  justify-content: space-between;
-}
-.quest-utilities a {
-  padding-block: 0.6rem;
+.quest-context {
+  color: var(--muted);
 }
 .panel {
   background: var(--paper);

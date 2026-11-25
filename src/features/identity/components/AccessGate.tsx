@@ -63,7 +63,7 @@ function SignIn({
             ? t('enterLearningCenter')
             : t('instructorSignIn')}
       </h2>
-      <p>
+      <p id="access-description">
         {expectedAccount
           ? t('reconnectHelp')
           : role === 'learner'
@@ -79,8 +79,11 @@ function SignIn({
         <label htmlFor="access-code">{t('accessCode')}</label>
         <input
           id="access-code"
+          aria-describedby="access-description"
           type="password"
           autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
           required
           value={code}
           onChange={(event) => setCode(event.target.value)}

@@ -1,7 +1,7 @@
-import type { ActiveQuest, ProgressState, Step, SavedCheckpoint, Checkpoint } from '../types.ts';
-import type { Database } from '../database.ts';
+import type { ActiveQuest, ProgressState, Step, SavedCheckpoint } from '../types.ts';
+import type { Queries } from '../database.ts';
 import { isObject, reject, textField } from '../http.ts';
-const noProgress: Checkpoint = { revision: 0, state: null, lastSaved: null };
+const noProgress = { revision: 0, state: null, lastSaved: null };
 function isFirstAttempt(step: Step): boolean {
   return step.independent === true || step.type === 'tutor';
 }
@@ -79,12 +79,12 @@ export function validateState(
   }
 }
 
-export async function getLegacy(
-  db: Database,
+export async function readProgress<State = ProgressState>(
+  db: Queries,
   accountId: string,
   questId: string,
   version: string,
-): Promise<Checkpoint> {
+): Promise<{ revision: number; state: State | null; lastSaved: string | null }> {
   const query = db.query<SavedCheckpoint, [string, string, string]>(`
     SELECT revision, state, last_saved AS "lastSaved" FROM progress
     WHERE account_id = ? AND quest_id = ? AND quest_version = ?

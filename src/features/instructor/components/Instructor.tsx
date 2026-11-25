@@ -87,6 +87,9 @@ export function Instructor({ access, signOut }: { access: Access; signOut: () =>
           <a className="button secondary" href={href(weekOneStudioPath + '?preview=instructor')}>
             {t('previewWeekOne')}
           </a>
+          <a className="button secondary" href={href('/quests/w02?preview=instructor')}>
+            {t('previewWeekTwo')}
+          </a>
           <button className="button secondary" onClick={() => void run(load)} disabled={busy}>
             {t('refresh')}
           </button>

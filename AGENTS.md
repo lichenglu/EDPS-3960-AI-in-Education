@@ -76,10 +76,40 @@ Plan **90–120 minutes of active game engagement per instructional week**. Show
 - Prefer a public copy from the publisher, authors, or a recognized repository. Label related readings as separate works. Use a public, view-only Google Drive link only when the copy is authorized for public redistribution.
 - Keep internal testing materials in the project workspace or approved private storage. The instructor handles Canvas uploads and student release. Use Canvas Course Materials or a library link for subscription readings that need course-only access.
 - Verify the assigned video segment, its captions, and playback in the game. Provide a direct link and a text alternative students can use if the player fails to load.
+- Use the shared `LessonVideo` component in `src/components/LessonVideo.tsx` for every new generated course video. Keep its transcript collapsed initially and scrollable at a compact height. Highlight the spoken line and follow playback and seeking by scrolling only the transcript, leaving the page and video in place. Use the video's WebVTT captions as the timing source, with one caption cue for each authored spoken line in the same order. Keep descriptive text and annotations available in the full text and print equivalents. Verify synchronization, backward seeking, caption visibility, keyboard scrolling, and reflow at 320px before release.
+
+## Generating course films with p5.js and p5.brush
+
+Use the Algorithmic Art skill for original course films. Build the animation in p5.js and use p5.brush for painted marks such as pencil strokes, hatching and washes. Give each film its own art direction. `DESIGN.md` governs the surrounding course interface. [Local skill](art/week-two-film/vendor/algorithmic-art/SKILL.md) · [OpenDesign skill](https://open-design.ai/skills/algorithmic-art/) · [Instructor’s visual reference](https://www.reddit.com/r/ChatGPT/comments/1wpddw4/i_asked_gpt6_astra_for_a_video_about_time_it_made/)
+
+1. **Storyboard the teaching.** For an I Do film, open with the question that makes the example worth watching. Introduce the people and tool before showing them in action. Pair each spoken line with what students should see. Model one complete example in a continuous video, then hand the decisions to students in We Do. Week 2’s requested cut is 90 seconds.
+2. **Design the motion.** Write a short art brief describing how a visual detail carries the idea across shots. In Week 2, the line of water under a door becomes the line a student draws under the evidence. Build from the skill’s viewer template so the artist can explore seeds, adjust the motion and revisit a frame. [Week 2 art brief](art/week-two-film/philosophy.md) · [Viewer template](art/week-two-film/vendor/algorithmic-art/templates/viewer.html)
+3. **Make frames reproducible.** Bundle compatible, pinned versions of p5.js and p5.brush with the authoring viewer. For p5.brush in instance mode, call `brush.instance(p)` before setup and create a WebGL canvas. Seed the random and noise functions and drive each shot from its frame time. Confirm the same seed and time reproduce the same frame after seeking. The existing Week 2 sketch uses custom Canvas 2D brushes inside p5.js. [p5.brush setup](https://github.com/acamposuribe/p5.brush#installation) · [Week 2 sketch](art/week-two-film/draw-reading-film.ts)
+4. **Cut to the voice.** Use the recorded narration to time movement, labels and captions. When the instructor names a clue, show it, point to it and hold long enough to read it. Leave room for selectable captions. Mix the original score beneath the voice. Keep the script, shot timings, score and voice editable. Follow the [narration workflow](#narration-during-testing-and-release) for review and release voices.
+5. **Watch the exported film in the quest.** Check the opening context, speech against actions, annotation legibility at phone width, music level, and transition into We Do. Verify play, pause, seeking, captions and the descriptive transcript. Students use the native video player.
+
+### Rebuild the Week 2 reference film
+
+Run these commands from `the-next-move/` with Bun, Playwright Chromium and FFmpeg after retrieving the approved CosyVoice recordings. The first command uses those recordings and verifies that every line matches the current script. For a temporary macOS review voice after a script change, pass `--review` to both the timing and video-render commands. For another week, adapt the week-specific inputs, output paths and duration before rendering. [Editable Week 2 script](src/curriculum/week-02/intro-films.ts)
+
+```sh
+bun scripts/time-week-two-voice.ts
+bun scripts/build-film-art.ts
+bun scripts/render-film-art.ts
+bun scripts/render-film-art.ts --video
+```
+
+The third command exports review stills and checks the seed and controls. The last renders 1080p at 24 fps. The web player uses the MP4, poster and WebVTT captions in `public/activities/week-two/`. The standalone MP4 in `art/week-two-film/renders/` carries its own selectable captions.
 
 ## Narration during testing and release
 
-Author and approve the story, branching dialogue, worked examples, and canonical feedback before release. Use browser voices as placeholders while scripts are in development. Once the instructor approves the full script batch, generate the final narration locally in **Voice Studio** using the course team's approved voices. Replace the placeholders in one batch. Keep scripts, audio, captions, transcripts, and character assets separate so each can be revised independently.
+Author and approve the story, branching dialogue, worked examples, and canonical feedback before release. Use a temporary review voice while scripts are in development. Generate final narration with course-team approved voices once the instructor approves the script. Keep scripts, audio, captions, transcripts, and character assets separate so each can be revised independently. Store voice references, raw narration and recording metadata privately.
+
+### CHPC narration
+
+- Run the CHPC login helper in a terminal and enter your university UID when prompted. Complete password and MFA in SSH. The helper stores the UID under ignored `data/narration-chpc/`. Use the accounts and queues available to you in `mychpc batch`. [Recording setup](docs/chpc-narration.md)
+- Use Voice Studio’s native CosyVoice 3 pipeline for production. Run a small sample and have the instructor review the delivery before marking a batch approved. Keep clone references, exact transcripts, approved voice settings and job records in private storage. The shared configuration pins the model. A private configuration can also pin the instructor-approved reference.
+- Generate narration on a compute node. Keep video rendering and playback verification local. For Week 2, export the authored lines with `bun scripts/export-week-two-narration.ts` and follow the film rebuild steps above.
 
 ## Asynchronous collaboration
 

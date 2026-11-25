@@ -11,6 +11,9 @@ import {
   lessonVideos,
   studioReferences,
 } from '@/curriculum/week-01/references';
+import { weekTwoLesson } from '@/curriculum/week-02/lesson';
+import { weekTwoReferences } from '@/curriculum/week-02/references';
+import { WeekTwoIntro } from '@/components/WeekTwoIntro';
 import { useI18n } from '@/lib/i18n/I18n';
 import './printable-week.css';
 
@@ -199,12 +202,148 @@ function QuestHandout({ steps }: Pick<Quest, 'steps'>) {
   );
 }
 
+function WeekTwoHandout() {
+  const { milestones, replay, driftBottle, future, quickCheck, stageMinutes, assignment } = weekTwoLesson;
+  return (
+    <>
+      {(['I Do', 'We Do'] as const).map((stage) => (
+        <section className="print-stage" key={stage}>
+          <h2>
+            {stage} <span className="print-time">· {stageMinutes[stage]} min</span>
+          </h2>
+          {stage === 'I Do' ? (
+            <WeekTwoIntro textOnly includeSources={false} />
+          ) : (
+            <p>
+              Work through the exhibits in order. Record a first response for each year, then compare it with
+              the archive notes at the end. The choices and records are classroom simulations. The source list
+              points to the historical accounts and studies behind them.
+            </p>
+          )}
+          {milestones
+            .filter((milestone) => milestone.stage === stage)
+            .map((milestone) => (
+              <section className="print-step" key={milestone.id}>
+                <h3>{milestone.year}</h3>
+                <p>{milestone.setup}</p>
+                {milestone.previewEvidence && (
+                  <p>
+                    <strong>{milestone.previewEvidence.title}.</strong> {milestone.previewEvidence.body}
+                  </p>
+                )}
+                <p>
+                  <strong>{milestone.prompt}</strong>
+                </p>
+                <List items={milestone.options.map((option) => option.label)} />
+                <WritingSpace />
+              </section>
+            ))}
+          {stage === 'We Do' && (
+            <>
+              <h3>{replay.title}</h3>
+              <p>{replay.setup}</p>
+              {replay.cards.map((card) => (
+                <section className="print-step" key={card.id}>
+                  <h4>{card.title}</h4>
+                  <List items={[card.observes, card.reply, card.whatNext, card.limit]} />
+                </section>
+              ))}
+              <p>
+                <strong>{replay.prompt}</strong>
+              </p>
+              <List items={replay.options.map((option) => option.label)} />
+              <WritingSpace />
+              <section className="print-step">
+                <h3>{driftBottle.title}</h3>
+                <p>{driftBottle.prompt}</p>
+                <WritingSpace />
+                <p>
+                  <strong>Sample note.</strong> {driftBottle.example}
+                </p>
+                <p>{driftBottle.replyPrompt}</p>
+                <WritingSpace />
+              </section>
+            </>
+          )}
+        </section>
+      ))}
+      <section className="print-stage">
+        <h2>
+          You Do <span className="print-time">· {stageMinutes['You Do']} min</span>
+        </h2>
+        <section className="print-step">
+          <h3>20?? · {future.title}</h3>
+          <p>{future.setup}</p>
+          <p>
+            Identify a tutoring approach, a decision a person should keep, and a way to check for learning.
+          </p>
+          <p>{future.rationalePrompt}</p>
+          <h4>Success criteria</h4>
+          <List items={future.criteria} />
+          <WritingSpace />
+          <WritingSpace />
+          <p>
+            <strong>
+              {assignment.title} · {assignment.due}.
+            </strong>{' '}
+            {assignment.instructions}
+          </p>
+        </section>
+        <section className="print-step">
+          <h3>Optional check</h3>
+          <p>{quickCheck.prompt}</p>
+          <List items={quickCheck.options.map((option) => option.label)} />
+        </section>
+      </section>
+      <section className="print-stage print-practice-notes">
+        <h2>Archive notes</h2>
+        <p>Read an entry after you record your first response for that year.</p>
+        {milestones.map((milestone) => (
+          <section className="print-step" key={milestone.id}>
+            <h3>
+              {milestone.year} · {milestone.title}
+            </h3>
+            <p>{milestone.summary}</p>
+            <p>{milestone.reveal}</p>
+            <p>{milestone.options.find((option) => option.best)?.feedback}</p>
+            {milestone.revealPanels?.map((panel) => (
+              <p key={panel.title}>
+                <strong>{panel.title}.</strong> {panel.body}
+              </p>
+            ))}
+          </section>
+        ))}
+        <section className="print-step">
+          <h3>Optional check feedback</h3>
+          <p>{quickCheck.options.find((option) => option.best)?.feedback}</p>
+        </section>
+      </section>
+      <section className="print-stage">
+        <h2>Sources</h2>
+        <ul>
+          {weekTwoReferences.map((source) => (
+            <li key={source.id}>
+              {source.citation} {source.locator}{' '}
+              {source.links.map((link) => (
+                <a key={link.url} href={link.url}>
+                  {link.label}{' '}
+                </a>
+              ))}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+}
+
 export function PrintableWeek({ quest }: { quest: Quest }) {
   const { t, href, locale } = useI18n();
   const isStudio = quest.id === weekOneManifest.id;
   const objective = isStudio ? weekOnePrintObjective : quest.objective;
   let handout: ReactNode = null;
   if (isStudio) handout = <WeekOneHandout />;
+  else if (quest.id === weekTwoLesson.id) handout = <WeekTwoHandout />;
   else if (quest.steps.length) handout = <QuestHandout steps={quest.steps} />;
 
   return (

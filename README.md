@@ -6,7 +6,7 @@ A browser course game for ED PS 3960-090. Choose a course week on the [landing p
 
 With Bun 1.3.9 or later and Node.js 20.19+ (20.x) or 22.12+, run `bun install --frozen-lockfile` and `bun run dev` from this directory. Vite serves the React app on port 4173 and applies compatible component edits with Fast Refresh. Bun runs the API on a separate local port and restarts it after server edits. Use the Vite **Local** URL in the terminal. Set `GAME_PORT=46817` to run alongside another preview, or set `GAME_DB` to use a separate database. The default database is `data/course.sqlite`.
 
-For a static preview, run `bun run build` and `bun run start`. Open the landing page and choose **Week 1 · AI literacy**. Visit `/instructor` and select **Use demo instructor** to see the roster.
+For a static preview, run `bun run build` and `bun run start`. Week 1 and Week 2 open locally without a code and save practice progress in the current browser. Visit `/instructor` and select **Use demo instructor** to see the roster.
 
 ## Visual style
 
@@ -35,11 +35,30 @@ The browser follows Bulletproof React’s feature organization, directed imports
 | `public/activities` | Archived Week 1 handout and shared activity assets |
 | `tests`, `tests/browser` | Content, rule, architecture, API and browser checks |
 
+Quest pages start with the shared `QuestMasthead`. The course link, week ribbon, spacing, and language control come from that component. Each quest supplies its title, navigation, and tools as needed. Course sign-in uses `QuestAccess` for its layout and `AccessGate` for the form and learner session. The instructor issues one code per learner for the course.
+
+Every entry to Week 2 opens on **I Do**. In *Water under the door*, a 90-second video, the instructor models how a teacher decides what to say after a reader answers and explains why that decision interested designers of computer tutors. Returning learners can resume their next saved activity directly from I Do. The native video player plays a single soundtrack with narration and an original score. Five on-screen annotations point to evidence in the story and tutor responses. English captions and a compact, scrollable transcript follow the same edit. The spoken line is highlighted and stays in view during playback and seeking. The We Do stage introduces the archive and all eight interactive years. The stage estimates are 2, 76, and 20 minutes. Local Instructor Mode opens the stages for rehearsal and keeps its answers in memory. Reset progress restarts the Week 2 work saved in this browser; Reset preview clears only the demonstration. Enrolled learners use their own saved checkpoints.
+
+Use [LessonVideo](src/components/LessonVideo.tsx) for future generated course videos. Supply the video, poster, WebVTT captions, and authored transcript sections. Caption cues must match the spoken lines in order, one cue per line, so repeated sentences remain distinct. The component supplies native controls, closed captions, a collapsed transcript with synchronized highlighting and scrolling, and full text/print alternatives. Keep sources and lesson headings in the surrounding lesson component. [WeekTwoIntro](src/components/WeekTwoIntro.tsx) shows the shared player in a lesson layout. When narration or editing changes, regenerate the captions from the final audio and verify forward and backward seeking in the running player.
+
+The editable script is in `src/curriculum/week-02/intro-films.ts`. The 90-second film uses instructor-approved CosyVoice 3 narration with an original score and 20 synchronized English captions. Algorithmic artwork follows the instructor’s film direction independently of the course interface. The art and timing files are in `art/week-two-film`. The packaged video, poster and captions are available to play immediately. Request approved line recordings from the course team when rebuilding final narration. [Recording setup](docs/chpc-narration.md)
+
+After retrieving and reviewing a completed batch, place its `complete.json` and line WAVs in `art/week-two-film/audio/cosyvoice3/`, then rebuild from `the-next-move/`:
+
+```sh
+bun scripts/time-week-two-voice.ts
+bun scripts/build-film-art.ts
+bun scripts/render-film-art.ts
+bun scripts/render-film-art.ts --video
+```
+
+The timing command defaults to approved CosyVoice recordings, verifies each clip against the current script, and writes the natural-speed master, visual timings, and one English caption cue per spoken line. It preserves every line and the 90-second cut, failing clearly if the speech and reading holds cannot fit. Use `--narration-dir PATH` for another approved recording folder. The viewer build refreshes the editable offline artwork; the render without `--video` checks seeds and controls and exports review stills. The video render also rebuilds the viewer so visual cues use the current timings, then publishes the MP4 and poster to `public/activities/week-two`. Temporary Samantha speech on macOS requires explicit `--review` on both timing and video rendering; the normal render does not fall back to it.
+
 A browser feature can import its own modules and shared code. Routes compose features. A test checks those boundaries and prevents browser imports of server-only answers. UI drafts and open panels stay local. Confirmed progress comes from the server. Both the 3D and text views use the same actions and checkpoint. [State management](https://github.com/alan2207/bulletproof-react/blob/master/docs/state-management.md) · [Testing](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md)
 
 To add a quest, keep its syllabus ID, define its versioned content, and add tests for its completion rules and independent task. Put protected feedback and replay results in the server. The archived Week 1 uses the v1 action contract. Week 5 uses the snapshot format. [HTTP contract](docs/openapi.yaml) · [Course implementation requirements](AGENTS.md)
 
-Every course week has a **Printable version** link on the landing page and a stable URL at `/quests/wNN/print`. Open it without a learner code, then select **Print or save as PDF**. Weeks 1 and 5 have activity handouts. Weeks in development show their syllabus summary until the activity is ready.
+Course weeks have a printable handout at `/quests/wNN/print`. Open it without a learner code, then select **Print or save as PDF**. Weeks 1, 2 and 5 have activity handouts. Weeks in development show their syllabus summary until the activity is ready.
 
 ## Edit course content
 
@@ -74,11 +93,11 @@ The Week 1 player is in `src/features/quests/week-one/studio`. Its editable cont
 
 ### Hosted storage and analytics
 
-`bun run dev` and the test suites use synthetic records and leave both hosted integrations off. Set `GAME_STUDIO_ACCOUNTS=1` for a local preview of the account-backed Week 1 flow. Use the following server environment settings for an approved HTTPS deployment.
+`bun run dev` and the test suites use synthetic records and leave both hosted integrations off. Set `GAME_STUDIO_ACCOUNTS=1` to preview the account-backed Week 1 and Week 2 flows locally. Use the following server environment settings for an approved HTTPS deployment.
 
 | Setting | Purpose |
 | --- | --- |
-| `GAME_RUNTIME=production`, `GAME_STORAGE=supabase` | Enables the hosted deployment and requires authenticated Week 1 play. |
+| `GAME_RUNTIME=production`, `GAME_STORAGE=supabase` | Enables the hosted deployment and requires authenticated play in Weeks 1 and 2. |
 | `SUPABASE_DATABASE_URL` | Server-only Postgres URL for a direct connection or Supabase session pooler. The server verifies TLS and initializes the private `course_game` schema. Use a dedicated database role with the required schema permissions. If the database supplies its own root certificate, set `SUPABASE_DATABASE_CA_FILE` to its PEM file on the server. |
 | `GAME_COURSE_ID`, `GAME_INSTRUCTOR_LABEL`, `GAME_INSTRUCTOR_CODE` | Provisions an instructor for the course on first startup. Use a private random URL-safe code of at least 32 characters. Remove the bootstrap settings after successful provisioning. |
 | `GAME_POSTHOG_ENABLED=1`, `POSTHOG_PROJECT_TOKEN`, `POSTHOG_HOST` | Opts in to server-side analytics. Set the PostHog ingestion host to `https://us.i.posthog.com` (default) or `https://eu.i.posthog.com`. |
