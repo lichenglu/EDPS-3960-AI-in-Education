@@ -1,0 +1,667 @@
+.quest-world {
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-gutter);
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  color: var(--ink);
+}
+.quest-session:not([hidden]) {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: var(--page-gutter);
+}
+.load-error {
+  border: 2px solid #b8432f;
+}
+.game-hud {
+  --hud-inset: clamp(0.9rem, 2vw, 1.8rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.week-one-mode:not([hidden]) {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+.game-hud-top,
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.65rem;
+}
+.game-hud-top {
+  justify-content: space-between;
+  padding-inline: var(--hud-inset);
+}
+.demo-controls {
+  margin-inline-start: auto;
+  justify-content: end;
+  font-size: 0.875rem;
+}
+.demo-controls .text-button {
+  padding-inline: 0.35rem;
+}
+.review-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  justify-content: end;
+}
+.station-review .quest-paper h2 {
+  scroll-margin-block-start: 9rem;
+}
+@media (max-width: 559px) {
+  .station-review .quest-preview-banner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .review-navigation {
+    justify-content: start;
+  }
+}
+.game-hud-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 0.75rem;
+  padding: 0.75rem var(--hud-inset);
+  background: var(--island-cream);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+.mission-title {
+  margin-right: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.game-home-link {
+  display: inline-flex;
+  justify-self: start;
+  min-height: 44px;
+  align-items: center;
+  color: var(--island-ink);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.mission-title h1 {
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+  letter-spacing: -0.025em;
+}
+.tools,
+.game-footer,
+.step-count,
+.dialogue-turns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+.tools button,
+.tools a,
+.dialogue-turns button,
+.tool-dialog header button,
+.game-footer button,
+.save-state button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid #c1b190;
+  border-radius: 50px;
+  color: var(--island-ink);
+  background: #fffdf6;
+  box-shadow: 0 2px 4px #794f2715;
+  font: 800 0.94rem/1.25 var(--animal-font-family);
+  text-decoration: none;
+}
+.tools {
+  gap: 0.35rem;
+}
+.tools :is(button, a) {
+  padding-inline: clamp(0.4rem, calc(5vw - 3.6rem), 0.8rem);
+}
+.tools svg {
+  flex: none;
+}
+.tools :is(a, button):hover,
+.dialogue-turns button:enabled:hover,
+.tool-dialog header button:hover {
+  background: #eef3dd;
+  border-color: #907753;
+}
+.save-state {
+  padding: 0.38rem 0.75rem;
+  border: 1px dashed #bcae90;
+  border-radius: 16px;
+  color: var(--island-muted);
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+.save-state[data-state='saved'] {
+  color: var(--moss);
+}
+.save-state:is([data-state='retry'], [data-state='error']) {
+  color: #903b27;
+  border: 2px solid #b8432f;
+}
+.save-state button {
+  margin-left: 0.4rem;
+  border: 1px solid #9b422e;
+}
+.play-area {
+  display: grid;
+  min-width: 0;
+  gap: var(--page-gutter);
+}
+.world-frame {
+  min-width: 0;
+  border-radius: 22px;
+  border: 1px solid #c2b393;
+  background: var(--island-cream);
+  padding: 0.45rem;
+}
+.world-scene {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(21rem, 58vh, 38rem);
+  border-radius: 17px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.world-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.world-still {
+  width: 100%;
+  height: 100%;
+  background: #e7e8cd url('../../../assets/workshop-evening.webp') center / cover no-repeat;
+}
+.scene-header {
+  justify-self: start;
+  align-self: start;
+  max-width: calc(100% - 2rem);
+  margin: clamp(0.55rem, 2vw, 1.25rem);
+  background: #fffbef;
+  color: var(--ink);
+  border: 1px solid #c2b393;
+  border-radius: 14px;
+  padding: 0.55rem 0.8rem;
+}
+.scene-header h2 {
+  font-size: clamp(1.2rem, 3vw, 1.65rem);
+  margin-top: 0.15rem;
+}
+.scene-location {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--moss);
+  font-size: 0.93rem;
+  font-weight: 850;
+}
+.scene-location svg {
+  flex: none;
+}
+.scene-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  color: var(--island-muted);
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.scene-dialogue {
+  grid-row: 3;
+  justify-self: center;
+  width: min(calc(100% - 2rem), 82rem);
+  min-width: 0;
+  margin: 0 0 clamp(0.65rem, 2vw, 1.4rem);
+  padding: clamp(0.65rem, 1.4vw, 1rem);
+  background: #fffaf0;
+  border: 1px solid #9e7a46;
+  border-radius: 17px;
+  box-shadow:
+    0 4px 0 #69503873,
+    0 8px 24px #402b2a26;
+}
+@supports (backdrop-filter: blur(14px)) {
+  .quest-world:not(.text-world) .scene-dialogue {
+    background: rgb(255 250 240 / 0.78);
+    backdrop-filter: blur(14px);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .quest-world:not(.text-world) .scene-dialogue {
+    background: #fffaf0;
+    backdrop-filter: none;
+  }
+}
+.scene-speech p {
+  margin-top: 0.35rem;
+  font-size: 1.075rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.scene-outcome {
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.65rem;
+  background: #e4f0df;
+  border-radius: 8px;
+  color: #244d37;
+}
+.world-scene.has-dialogue {
+  min-height: clamp(30rem, 69vh, 45rem);
+}
+.quest-paper {
+  width: min(100%, 56rem);
+  justify-self: center;
+  padding: clamp(1rem, 1.8vw, 1.75rem);
+  overflow-wrap: anywhere;
+  background: var(--island-cream);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.quest-paper h2 {
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  margin-bottom: 0.55rem;
+}
+.speaker-tag {
+  display: inline-block;
+  padding: 0.22rem 0.7rem;
+  border-radius: 50px;
+  background: #ffdd8f;
+  color: var(--ink);
+  font: 850 0.95rem/1.45 var(--animal-font-family);
+}
+.speaker-tag[data-speaker='Yinqi'] {
+  background: #ffd2b8;
+}
+.speaker-tag[data-speaker='Eunseo'] {
+  background: #cde6a9;
+}
+.speaker-tag[data-speaker='Pip'] {
+  background: #9ae5d9;
+}
+.dialogue-turns {
+  margin-top: 0.65rem;
+  justify-content: space-between;
+  color: var(--island-muted);
+}
+.line-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  font-size: 0.9rem;
+}
+.line-controls button.dialogue-arrow {
+  min-width: 44px;
+  padding-inline: 0.45rem;
+}
+.dialogue-turns button:disabled {
+  background: transparent;
+  box-shadow: none;
+  color: var(--island-muted);
+  border-style: dashed;
+  cursor: default;
+}
+.dialogue-turns button.scene-inspect:not(:disabled) {
+  background: var(--island-mint);
+  color: var(--ink);
+  border-color: #67884f;
+}
+.quest-world details {
+  margin: 0.65rem 0;
+}
+.station-actions {
+  margin-top: 0.6rem;
+}
+.station-actions .prompt {
+  font-weight: 800;
+}
+.station-actions .choices {
+  gap: 0.6rem;
+}
+.choice {
+  font: 700 1rem/1.45 var(--animal-font-family);
+}
+.quest-world .choice {
+  background: var(--island-paper);
+  border-radius: 16px;
+  border: 1px solid #9e8c71;
+}
+.quest-world .choice:hover {
+  background: #f2edda;
+}
+.quest-world .choice[aria-pressed='true'] {
+  background: #d5eee1;
+  border-color: #4b7966;
+  box-shadow: inset 4px 0 #4b7966;
+}
+.practice-record + .practice-record {
+  margin-top: 1rem;
+}
+.practice-record h3 {
+  margin: 0 0 0.2rem;
+  color: var(--island-ink);
+  font-size: 1.04rem;
+}
+.record-slip,
+.quest-world .feedback,
+.quest-world .criteria {
+  padding: 0.8rem 0.95rem;
+  margin: 0.7rem 0;
+  background: var(--island-parchment);
+  border: 1px solid #d4c6a3;
+  border-radius: 12px;
+}
+.record-slip strong {
+  display: inline-block;
+  background: #dceac4;
+  color: var(--ink);
+  padding: 0.12rem 0.5rem;
+  border-radius: 8px;
+  margin-block: 0.1rem;
+}
+.record-slip p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rule-selector,
+.evidence-picker {
+  min-width: 0;
+  border: 1px solid #bba987;
+  border-radius: 16px;
+  padding: 0.65rem 0.9rem;
+  margin: 0.75rem 0;
+}
+.rule-selector legend,
+.evidence-picker legend {
+  font-weight: 850;
+}
+.rule-selector label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+}
+.rule-selector input {
+  width: 1.2rem;
+  height: 1.2rem;
+  min-height: 1.2rem;
+  margin: 0;
+  accent-color: var(--moss);
+}
+.evidence-picker .choice {
+  margin: 0.2rem 0;
+}
+.text-world .world-frame {
+  width: min(100%, 56rem);
+  justify-self: center;
+  padding: 0;
+}
+.text-world .world-scene {
+  min-height: 0;
+  background: #f9f1de;
+}
+.text-world .scene-header {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.text-world .scene-dialogue {
+  box-shadow: none;
+}
+.step-actions {
+  margin-top: 1.2rem;
+}
+.game-footer {
+  gap: 0.45rem 1rem;
+  padding: 0.45rem 1rem;
+  border-radius: 16px;
+  background: var(--island-parchment);
+  color: var(--muted);
+  font-weight: 700;
+}
+.game-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.quest-world .return-bottle {
+  border-radius: 16px;
+  padding: 0.5rem 1rem;
+  max-width: 50rem;
+}
+.tool-dialog {
+  border: 2px solid var(--island-keyline);
+  border-radius: 20px;
+  background: var(--island-parchment);
+  color: var(--ink);
+  width: min(42rem, calc(100% - 1.5rem));
+  max-height: 85vh;
+  padding: 1.2rem clamp(1rem, 3vw, 2rem);
+  overflow-wrap: anywhere;
+}
+.tool-dialog::backdrop {
+  background: #382d2075;
+}
+.tool-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.tool-dialog h2 {
+  font-size: 1.65rem;
+}
+.tool-dialog section {
+  border-top: 1px dashed #c5b799;
+  padding: 0.75rem 0;
+}
+.station-map {
+  display: grid;
+  gap: 0.3rem;
+  margin-block: 0.5rem 1rem;
+}
+.station-map :is(button, .station-map-label) {
+  min-height: 44px;
+  width: 100%;
+  border-radius: 12px;
+  padding: 0.45rem 0.65rem;
+}
+.station-map-label {
+  display: block;
+}
+.station-map small {
+  color: var(--island-muted);
+}
+.station-map button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--island-cream);
+  color: var(--island-ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: start;
+}
+.station-map button svg {
+  flex: none;
+}
+.station-map [aria-current],
+.station-map button:hover {
+  border-radius: 12px;
+  background: #e0edc8;
+}
+.review-scene-picker {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+}
+.review-scene-picker select {
+  flex: 1 1 14rem;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--island-cream);
+  font: inherit;
+}
+.quest-preview {
+  display: grid;
+  min-width: 0;
+  gap: var(--page-gutter);
+}
+
+.quest-preview-banner {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.2rem 0.5rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--island-parchment);
+}
+
+.quest-preview-banner strong {
+  color: var(--island-ink);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.quest-preview-banner p {
+  grid-column: 1 / -1;
+}
+@media (max-width: 359px) {
+  .quest-preview-banner {
+    padding-inline: 0.65rem;
+  }
+  .quest-preview-banner .button {
+    padding-inline: 0.75rem;
+  }
+}
+
+.quest-preview :is([data-guide-anchor], .choices, h3) {
+  scroll-margin-block-start: 7rem;
+}
+
+.station-still {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.draft-note {
+  color: var(--muted);
+}
+@media (min-width: 960px) {
+  .paired-play-area {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-rows: clamp(34rem, 72vh, 48rem);
+  }
+  .paired-play-area .world-frame {
+    display: flex;
+    min-height: 0;
+  }
+  .paired-play-area .world-scene {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+  .paired-play-area .quest-paper {
+    width: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+  .paired-play-area .go-to-activity {
+    display: none;
+  }
+}
+@media (max-width: 639px) {
+  .game-hud {
+    --hud-inset: 0.75rem;
+  }
+  .game-hud-row {
+    border-radius: 18px;
+  }
+  .mission-title {
+    width: 100%;
+  }
+  .tools button,
+  .tools a {
+    padding: 0.35rem 0.65rem;
+  }
+  .world-scene.has-dialogue {
+    min-height: 0;
+    grid-template-rows: auto minmax(10.25rem, 1fr) auto;
+    background: #e6ebcf;
+  }
+  .world-scene.has-dialogue .world-art {
+    inset-block: 2.25rem auto;
+    height: clamp(17rem, 78vw, 22rem);
+  }
+  .text-world .world-scene.has-dialogue {
+    grid-template-rows: auto 0 auto;
+    background: #f9f1de;
+  }
+  .scene-dialogue {
+    width: calc(100% - 1rem);
+  }
+  .scene-dialogue .speaker-tag {
+    font-size: 0.8rem;
+    padding-inline: 0.45rem;
+  }
+  .scene-dialogue .line-controls {
+    gap: 0.3rem;
+  }
+  .scene-dialogue .line-controls button {
+    padding-inline: 0.45rem;
+  }
+  .station-actions .button,
+  .step-actions .button {
+    width: 100%;
+  }
+}
+
+.quest-world .activity-instructions {
+  margin-block: 0.5rem;
+}
+.activity-instructions p {
+  color: var(--island-muted);
+}
+.station-actions h3:focus {
+  outline: 2px solid var(--island-keyline);
+  outline-offset: 3px;
+}
+
+.quest-update {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--island-parchment);
+}
+.archived-responses .actions {
+  margin-bottom: 0.65rem;
+}

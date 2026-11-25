@@ -1,0 +1,11 @@
+/data/
+/node_modules/
+/.vite/
+/dist/
+.env
+.env.*
+
+/test-results/
+/playwright-report/
+/.build-*/
+.DS_Store

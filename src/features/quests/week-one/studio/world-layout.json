@@ -1,0 +1,7 @@
+[
+  { "id": "transcript", "x": -3.65, "z": 1.0, "color": "#92c9dc" },
+  { "id": "reading", "x": -3.7, "z": -2.3, "color": "#a9bf72" },
+  { "id": "tickets", "x": 0, "z": -2.7, "color": "#e9b65d" },
+  { "id": "hints", "x": 3.7, "z": -2.25, "color": "#baa8d4" },
+  { "id": "toolkit", "x": 3.7, "z": 1.15, "color": "#e3a387" }
+]

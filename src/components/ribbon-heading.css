@@ -1,0 +1,50 @@
+.ribbon-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  width: max-content;
+  max-width: 100%;
+  row-gap: 1.125rem;
+}
+.ribbon-heading > h1 {
+  max-width: 100%;
+  margin: 0;
+  text-align: center;
+}
+.ribbon-heading-row {
+  width: 100%;
+}
+
+/* Include the library's two .6em tails and .4em fold in the ribbon's bounds. */
+.course-ribbon {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  contain: inline-size;
+  padding: 0 0.6em 0.4em;
+  font: 800 20px/1 var(--animal-font-family);
+}
+.course-ribbon > span {
+  flex: 1;
+  min-width: 0;
+}
+.course-ribbon span {
+  color: var(--ink);
+}
+
+.ribbon-heading--compact {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.ribbon-heading--compact .course-ribbon {
+  flex: none;
+  width: auto;
+  contain: none;
+  font-size: 14px;
+}
+.ribbon-heading-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

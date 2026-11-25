@@ -1,0 +1,132 @@
+.field-journal {
+  display: flex;
+  flex-direction: column;
+  color: var(--island-ink, #794f27);
+}
+.field-journal .quest-sidebar,
+.field-journal .story-panel,
+.field-journal .return-bottle {
+  background: var(--island-paper, #fffaf0);
+  border: 1px solid var(--island-line, #c8b99e);
+  border-radius: 1.5rem;
+}
+.field-journal .quest-sidebar {
+  padding: 1.1rem;
+}
+.field-journal .quest-sidebar h2,
+.field-journal .step h2 {
+  font-family: var(--animal-font-family);
+  font-weight: 900;
+  color: var(--island-ink, #794f27);
+}
+.field-journal .stage-list {
+  gap: 0.25rem;
+}
+.field-journal .stage-list li {
+  padding: 0.45rem 0.55rem;
+}
+.field-journal .stage-list li.current {
+  background: #e0f1df;
+}
+.field-journal progress {
+  height: 0.4rem;
+  accent-color: #36745e;
+}
+.field-journal progress,
+.field-journal progress::-webkit-progress-bar {
+  background: #e2d8be;
+}
+.field-journal progress::-webkit-progress-value {
+  background: #36745e;
+}
+.field-journal progress::-moz-progress-bar {
+  background: #36745e;
+}
+.field-journal .objective,
+.field-journal .connection,
+.field-journal .stage-list span,
+.field-journal .step-meta,
+.field-journal .how p,
+.field-journal .desk-fallback {
+  color: var(--island-muted, #725d42);
+}
+.field-journal .save-line {
+  background: #d9edda;
+  background-image: repeating-linear-gradient(135deg, transparent 0 10px, #ffffff35 10px 12px);
+  color: #345441;
+  border-bottom: 1px solid #b1ceaf;
+}
+.field-journal .step-meta .eyebrow {
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  background: #ffe7ad;
+  color: #66431b;
+}
+.field-journal .speaker {
+  margin-block: 0.2rem 0.8rem;
+  color: var(--island-ink, #794f27);
+  font-weight: 800;
+}
+.field-journal .speaker span {
+  color: #59452d;
+  background: #e6eecf;
+}
+.field-journal .speaker-yinqi span {
+  background: #f8d3b7;
+}
+.field-journal .speaker-eunseo span,
+.field-journal .speaker-pip span {
+  background: #ffe0a1;
+}
+.field-journal .how,
+.field-journal .desk-toggle {
+  border-top: 1px dashed var(--island-line, #c8b99e);
+}
+.field-journal .choice,
+.field-journal .desk-options button {
+  border: 1px solid #a18b6f;
+  border-radius: 1rem;
+  color: var(--island-ink, #794f27);
+  background: #fffdf6;
+}
+.field-journal .choice:hover,
+.field-journal .desk-options button:hover {
+  background: #f6f0d9;
+}
+.field-journal .choice[aria-pressed='true'],
+.field-journal .desk-options button[aria-pressed='true'] {
+  background: #dcf2e5;
+  border-color: #4f7e68;
+  box-shadow: inset 4px 0 #4f7e68;
+}
+.field-journal .criteria,
+.field-journal .feedback {
+  background: #eef4df;
+  border-radius: 1rem;
+  border-color: #87a27c;
+}
+.field-journal .step-actions {
+  margin-top: 1.2rem;
+}
+.field-journal .return-bottle {
+  margin-top: 1.2rem;
+  padding: 0.8rem 1.1rem;
+}
+@media (max-width: 430px) {
+  .field-journal .quest-sidebar {
+    padding: 0.85rem;
+  }
+  .field-journal .stage-list li {
+    padding: 0.4rem;
+  }
+}
+
+.field-journal .quest-layout {
+  flex: 1 0 auto;
+}
+.field-journal .story-panel {
+  align-self: stretch;
+}
+.field-journal > .return-bottle {
+  margin-bottom: 0;
+}

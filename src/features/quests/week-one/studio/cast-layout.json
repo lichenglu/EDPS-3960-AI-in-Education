@@ -1,0 +1,11 @@
+{
+  "characters": {
+    "transcript": { "x": -5.58, "z": 0.68, "scale": 1.26 },
+    "reading": { "x": -2.38, "z": -3.9, "scale": 1.26 },
+    "tickets": { "x": 1.86, "z": -2.55, "scale": 1.26 },
+    "hints": { "x": 5.57, "z": -2.42, "scale": 1.19 },
+    "toolkit": { "x": 1.27, "z": 1.35, "scale": 1.26 },
+    "gokhan": { "x": 0, "z": 3.22, "scale": 1.06 }
+  },
+  "welcomeBench": { "x": 1.56, "z": 3.67 }
+}

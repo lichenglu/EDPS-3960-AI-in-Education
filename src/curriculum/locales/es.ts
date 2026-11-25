@@ -1,0 +1,17 @@
+export const topics: Readonly<Record<string, string>> = {
+  w01: 'Alfabetización en IA',
+  w02: 'Historia de la IA en la educación',
+  w03: 'Modelos del estudiante y adaptación',
+  w04: 'Fracaso productivo y transferencia',
+  w05: 'Andamiaje y formulación de preguntas',
+  w06: 'Retroalimentación, retirada gradual y transferencia',
+  w07: 'Investigación basada en el diseño',
+  w08: 'Prototipado y pruebas',
+  w09: 'Ética y diseño responsable de la IA',
+  w10: 'IA generativa e instrucciones',
+  w11: 'Pruebas de referencia y entornos de evaluación',
+  w12: 'Agentes de IA y supervisión humana',
+  w13: 'Simulación de IA física',
+  w14: 'Pruebas y revisión del proyecto final',
+  w15: 'Síntesis y adelanto opcional',
+};

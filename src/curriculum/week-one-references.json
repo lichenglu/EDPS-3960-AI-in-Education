@@ -1,0 +1,84 @@
+[
+  {
+    "id": 1,
+    "short": "Crash Course video",
+    "citation": "Crash Course. (2019, August 9). What is artificial intelligence? Crash Course AI #1 [Video].",
+    "locator": "The opening examples show phone autocomplete and video recommendations.",
+    "links": [
+      { "label": "Watch the episode on YouTube", "url": "https://www.youtube.com/watch?v=a0_lo_GDcFw" },
+      {
+        "label": "Read the transcript or watch with captions on PBS",
+        "url": "https://www.pbs.org/video/what-is-artificial-intelligence-1-hptal6/"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "short": "Digital literacy",
+    "citation": "Law, N., Woo, D., de la Torre, J., & Wong, G. (2018). A global framework of reference on digital literacy skills for indicator 4.4.2 (Information Paper No. 51). UNESCO Institute for Statistics.",
+    "locator": "Competence area 1 covers information and data literacy.",
+    "links": [
+      { "label": "Read the UNESCO report", "url": "https://unesdoc.unesco.org/ark:/48223/pf0000265403" }
+    ]
+  },
+  {
+    "id": 3,
+    "short": "Data literacy",
+    "citation": "Bonikowska, A., Sanmartin, C., & Frenette, M. (2019). Data literacy: What it is and how to measure it in the public service (Analytical Studies: Methods and References, No. 022). Statistics Canada.",
+    "locator": "Section 3 reviews definitions of data literacy. Section 4 compares competency frameworks.",
+    "links": [
+      {
+        "label": "Read the Statistics Canada report",
+        "url": "https://www150.statcan.gc.ca/n1/pub/11-633-x/11-633-x2019003-eng.htm"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "short": "AI literacy",
+    "citation": "Long, D., & Magerko, B. (2020). What is AI literacy? Competencies and design considerations. Proceedings of the 2020 CHI Conference on Human Factors in Computing Systems, 1–16. ACM.",
+    "locator": "The authors’ definition connects using AI with evaluating it critically.",
+    "links": [{ "label": "Open the ACM paper", "url": "https://doi.org/10.1145/3313831.3376727" }]
+  },
+  {
+    "id": 5,
+    "short": "User, developer, and critic perspectives",
+    "citation": "Lee, V. R. (2025). User-Developer-Critic (UDC) perspectives in AI literacy framework documents [Preprint]. Center for Open Science.",
+    "locator": "Pages 1–2 describe the three perspectives proposed by Lee and Long. The workshop applies them to a fictional tutor.",
+    "links": [{ "label": "Open the assigned preprint", "url": "https://doi.org/10.35542/osf.io/xzvyr_v1" }]
+  },
+  {
+    "id": 6,
+    "short": "SNAIL",
+    "citation": "Laupichler, M. C., Aster, A., Haverkamp, N., & Raupach, T. (2023). Development of the “Scale for the assessment of non-experts’ AI literacy” – An exploratory factor analysis. Computers in Human Behavior Reports, 12, 100338.",
+    "locator": "Tables 1–2, item V06. The workshop paraphrases the item and supplies a fictional learner response.",
+    "links": [{ "label": "Read the SNAIL study", "url": "https://doi.org/10.1016/j.chbr.2023.100338" }]
+  },
+  {
+    "id": 7,
+    "short": "MAILS",
+    "citation": "Carolus, A., Koch, M. J., Straka, S., Latoschik, M. E., & Wienrich, C. (2023). MAILS – Meta AI literacy scale: Development and testing of an AI literacy questionnaire based on well-founded competency models and psychological change- and meta-competencies. Computers in Human Behavior: Artificial Humans, 1, 100014.",
+    "locator": "Appendix A, item 9. The workshop paraphrases the item and supplies a fictional learner response.",
+    "links": [{ "label": "Read the MAILS study", "url": "https://doi.org/10.1016/j.chbah.2023.100014" }]
+  },
+  {
+    "id": 8,
+    "short": "GLAT",
+    "citation": "Jin, Y., Martinez-Maldonado, R., Gašević, D., & Yan, L. (2025). GLAT: The generative AI literacy assessment test. Computers and Education: Artificial Intelligence, 9, 100436.",
+    "locator": "Table 2, original item 18. The workshop paraphrases the research-summary question and supplies fictional responses.",
+    "links": [
+      { "label": "Open the GLAT study", "url": "https://doi.org/10.1016/j.caeai.2025.100436" },
+      {
+        "label": "Read Table 2 in the open paper (PDF)",
+        "url": "https://researchmgt.monash.edu/ws/portalfiles/portal/731701763/698957675-oa.pdf#page=7"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "short": "Course orientation",
+    "citation": "Li, C. (Spring 2027). ED PS 3960-090: AI in Education [Course syllabus]. University of Utah.",
+    "locator": "The course schedule lists the Week 1 orientation check on January 17 and sets deadlines at 11:59 p.m. Mountain Time. Open this course in Canvas and choose Syllabus.",
+    "links": [{ "label": "Sign in to University of Utah Canvas", "url": "https://utah.instructure.com/" }]
+  }
+]

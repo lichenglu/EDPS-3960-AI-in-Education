@@ -1,0 +1,69 @@
+.language-select {
+  position: relative;
+  justify-self: end;
+  inline-size: fit-content;
+  font-weight: 800;
+}
+
+.language-trigger,
+.language-options button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  border: 1px solid #ae9a77;
+  border-radius: 999px;
+  background: #fffcf2;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.language-trigger {
+  inline-size: 44px;
+  padding: 0;
+}
+
+.language-trigger:hover,
+.language-trigger[aria-expanded='true'],
+.language-options button:hover {
+  background: #e6eee0;
+}
+
+.language-options {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + 0.4rem);
+  inset-inline-start: 0;
+  min-inline-size: 9rem;
+  padding: 0.4rem;
+  border: 1px solid #ae9a77;
+  border-radius: 14px;
+  background: #fffcf2;
+  box-shadow: 0 5px 14px #51412a26;
+}
+
+.language-options:not([hidden]) {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.language-options button {
+  justify-content: flex-start;
+  padding-inline: 0.85rem;
+  border-color: transparent;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.language-options button[aria-pressed='true'] {
+  background: #d0ebdb;
+  border-color: #559c82;
+}
+
+.course-heading .language-options,
+.studio-heading .language-options,
+.top-controls .language-options {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}

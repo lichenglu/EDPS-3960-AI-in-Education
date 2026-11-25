@@ -1,0 +1,519 @@
+openapi: 3.1.1
+info:
+  title: AI in Education course game
+  version: 1.0.0
+  description: >
+    The browser uses an opaque session token. Every operation derives the course and account from the token.
+    The current Week 1 studio uses its own versioned snapshot. Archived Week 1 version 3 investigates welcome notices.
+    Earlier versions 1 and 2 retain their own read-only snapshots. The original snapshot read remains available at
+    GET /api/progress/w01, and its old PUT route returns 410. Week 5 continues to use the unversioned progress service.
+servers:
+  - url: /api/v1
+security:
+  - bearer: []
+paths:
+  /session:
+    post:
+      operationId: openSession
+      summary: Exchange an instructor-issued access code for a session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, minLength: 1, maxLength: 256, writeOnly: true }
+      responses:
+        '200':
+          description: Connected account and a token that expires in 30 days
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/Account' }
+                  - type: object
+                    required: [token]
+                    properties: { token: { type: string, pattern: '^[a-zA-Z0-9_-]{43}$' } }
+        '401': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+    get:
+      operationId: readSession
+      responses:
+        '200':
+          description: Account role and course label
+          content: { application/json: { schema: { $ref: '#/components/schemas/Account' } } }
+        default: { $ref: '#/components/responses/Problem' }
+    delete:
+      operationId: revokeSession
+      responses:
+        '200':
+          description: Token revoked
+          content: { application/json: { schema: { type: object, required: [signedOut], properties: { signedOut: { const: true } } } } }
+        default: { $ref: '#/components/responses/Problem' }
+  /quests/w01/demo-run:
+    post:
+      operationId: startLocalWeekOneRun
+      summary: Begin an isolated Week 1 practice run in a local preview
+      description: >
+        A learner with canStartDemoRun may request a new learner session. Each new run uses an isolated synthetic
+        course and scripted AI. Earlier sessions, saved work and the original course remain available.
+      responses:
+        '201':
+          description: Fresh learner session for a new practice run
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/Account' }
+                  - type: object
+                    required: [token]
+                    properties: { token: { type: string, pattern: '^[a-zA-Z0-9_-]{43}$' } }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+  /quests/{questId}/progress:
+    parameters:
+      - { $ref: '#/components/parameters/Quest' }
+    get:
+      operationId: readCheckpoint
+      description: The signed-in learner's current Week 1 scene, saved evidence and post-submission materials
+      responses:
+        '200': { $ref: '#/components/responses/Checkpoint' }
+        '404': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+  /quests/w01/archive/{version}:
+    parameters:
+      - { name: version, in: path, required: true, schema: { enum: ['1', '2'] } }
+    get:
+      operationId: readEarlierWeekOne
+      description: Return the signed-in learner’s earlier kit case as it was saved. A new notice case starts at revision zero and earns its own stage credit.
+      responses:
+        '200':
+          description: Historical snapshot using the evidence fields of its original version
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [questId, contentVersion, revision, lastSaved, state]
+                properties:
+                  questId: { const: w01 }
+                  contentVersion: { enum: ['1', '2'] }
+                  revision: { type: integer, minimum: 0 }
+                  lastSaved: { type: string, format: date-time }
+                  state:
+                    type: object
+                    required: [index, entries]
+                    properties:
+                      index: { type: integer, minimum: 0 }
+                      entries: { type: object, additionalProperties: { type: object } }
+        '404': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+  /quests/{questId}/actions:
+    parameters:
+      - { $ref: '#/components/parameters/Quest' }
+    post:
+      operationId: commitAction
+      description: >
+        Reuse an action ID after an interrupted request. An exact intent retry for that learner, quest and submitted
+        content version returns the original receipt, even after newer actions. Receipts persist across migrations.
+        A reused ID with a different intent, a stale revision, a stale version or an already filed first attempt returns
+        409. Refetch progress, preserve the local draft, and submit an appropriate new action with a new ID.
+        Standard practice choices and the Critic activity’s attached evidence can be revised after the activity is
+        complete. These actions use the current checkpoint revision and retain the earned scene and stage progress.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Action' }
+            example:
+              actionId: inspect-organizer-notice-01
+              contentVersion: '3'
+              expectedRevision: 0
+              intent: { type: inspectEvidence, stepId: opening, evidence: practice }
+      responses:
+        '200': { $ref: '#/components/responses/Checkpoint' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+  /quests/{questId}/bottles:
+    parameters:
+      - { $ref: '#/components/parameters/Quest' }
+    get:
+      operationId: readBottles
+      description: Own note, a classmate's note and incoming replies. A null next field after posting signals the authored example.
+      responses:
+        '200': { $ref: '#/components/responses/Exchange' }
+        default: { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: sendBottle
+      description: Record the initial note. Retrying preserves the original text.
+      requestBody: { $ref: '#/components/requestBodies/Message' }
+      responses:
+        '200': { $ref: '#/components/responses/Exchange' }
+        default: { $ref: '#/components/responses/Problem' }
+  /bottles/{bottleId}/replies:
+    parameters:
+      - name: bottleId
+        in: path
+        required: true
+        description: ID of an eligible peer bottle or example-w01 for the displayed authored example
+        schema: { type: string }
+    post:
+      operationId: replyToBottle
+      requestBody: { $ref: '#/components/requestBodies/Message' }
+      responses:
+        '200': { $ref: '#/components/responses/Exchange' }
+        default: { $ref: '#/components/responses/Problem' }
+  /ai-lab/runs:
+    post:
+      operationId: runPracticeLab
+      description: Run a fixed fictional prompt after saving the independent first attempt. The public demo courses, disabled live service and exhausted allowances return the scripted reply.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [mode], properties: { mode: { enum: [answer, hint] } } } } }
+      responses:
+        '200':
+          description: Labeled practice reply
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [text, source]
+                properties: { text: { type: string }, source: { enum: [generated, scripted] } }
+        default: { $ref: '#/components/responses/Problem' }
+  /studio/w01/config:
+    get:
+      operationId: readStudioConfig
+      security: []
+      responses:
+        '200':
+          description: Deployment settings for the Week 1 player
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [requireAccount, localPreview]
+                properties:
+                  requireAccount: { type: boolean }
+                  localPreview: { type: boolean }
+  /studio/w01:
+    get:
+      operationId: readStudioCheckpoint
+      responses:
+        '200': { $ref: '#/components/responses/StudioCheckpoint' }
+        default: { $ref: '#/components/responses/Problem' }
+    put:
+      operationId: saveStudioCheckpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, revision, state]
+              properties:
+                version: { const: studio-1 }
+                revision: { type: integer, minimum: 0 }
+                state: { $ref: '#/components/schemas/StudioState' }
+      responses:
+        '200': { $ref: '#/components/responses/StudioCheckpoint' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+  /instructor/roster:
+    get:
+      operationId: readRoster
+      responses:
+        '200':
+          description: Learners enrolled in this instructor's course with per-quest stage summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [learners]
+                properties:
+                  learners:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label, progress]
+                      properties:
+                        id: { type: string }
+                        label: { type: string }
+                        progress: { type: object, additionalProperties: { $ref: '#/components/schemas/StageSummary' } }
+                        studioProgress:
+                          type: object
+                          description: Current Week 1 status, distinct from archived Week 1 progress
+                          required: [stage, stages, complete, completedMissions, totalMissions, lastSaved]
+                          properties:
+                            stage: { enum: [i-do, we-do, null] }
+                            stages:
+                              type: object
+                              properties:
+                                i-do: { enum: [complete, in-progress, not-started] }
+                                we-do: { enum: [complete, in-progress, not-started] }
+                                you-do: { const: optional }
+                            complete: { type: boolean }
+                            completedMissions: { type: integer, minimum: 0, maximum: 5 }
+                            totalMissions: { const: 5 }
+                            lastSaved: { type: string, format: date-time }
+        default: { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: createLearner
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [label], properties: { label: { type: string, minLength: 1, maxLength: 60 } } } } }
+      responses:
+        '201':
+          description: Private code for the instructor to deliver to the learner
+          content: { application/json: { schema: { type: object, required: [id, label, code], properties: { id: { type: string }, label: { type: string }, code: { type: string } } } } }
+        default: { $ref: '#/components/responses/Problem' }
+  /instructor/learners/{learnerId}/reissue:
+    parameters:
+      - { name: learnerId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: reissueCode
+      responses:
+        '200':
+          description: New private code. Existing sessions and the previous code are revoked. Progress is preserved.
+          content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string } } } } }
+        default: { $ref: '#/components/responses/Problem' }
+  /instructor/moderation:
+    get:
+      operationId: readModerationQueue
+      responses:
+        '200':
+          description: Visible posts and peer replies in the instructor's course
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [messages]
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label, questId, text, createdAt, kind]
+                      properties:
+                        id: { type: string }
+                        label: { type: string }
+                        questId: { type: string }
+                        text: { type: string }
+                        createdAt: { type: string, format: date-time }
+                        kind: { enum: [bottle, reply] }
+        default: { $ref: '#/components/responses/Problem' }
+  /instructor/moderation/{messageId}:
+    parameters:
+      - { name: messageId, in: path, required: true, schema: { type: string } }
+    delete:
+      operationId: hideMessage
+      responses:
+        '200':
+          description: Message hidden
+          content: { application/json: { schema: { type: object, required: [hidden], properties: { hidden: { const: true } } } } }
+        default: { $ref: '#/components/responses/Problem' }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+  parameters:
+    Quest: { name: questId, in: path, required: true, schema: { type: string, pattern: '^w[0-9]{2}$' } }
+  responses:
+    Problem:
+      description: >
+        RFC 9457 problem. 400 is malformed input, 401 needs authentication, 403 lacks permission or an activity prerequisite,
+        404 is unavailable or out of scope, 405 is a wrong method, 409 is a conflict, 413 is too large, 415 requires JSON,
+        422 is a move unavailable in the saved state, 429 is sign-in throttling, and 500 is an unexpected failure.
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            required: [type, title, status, detail, error]
+            properties:
+              type: { type: string, format: uri-reference }
+              title: { type: string }
+              status: { type: integer }
+              detail: { type: string }
+              error: { type: string, description: Message for existing clients }
+          example: { type: /problems/stale-revision, title: A newer checkpoint was saved. Reload your record and review your draft., status: 409, detail: A newer checkpoint was saved. Reload your record and review your draft., error: A newer checkpoint was saved. Reload your record and review your draft. }
+    Checkpoint:
+      description: Saved checkpoint or original receipt for an identical retry
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Checkpoint' }
+          example:
+            questId: w01
+            contentVersion: '3'
+            revision: 1
+            lastSaved: '2026-11-01T18:35:00.000Z'
+            state: { index: 0, entries: { opening: { inspected: [practice] } } }
+    Exchange:
+      description: Authorized class exchange
+      content: { application/json: { schema: { $ref: '#/components/schemas/Exchange' } } }
+    StudioCheckpoint:
+      description: Stored revision for the signed-in learner. Revision zero has no state or save time.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [revision, state, lastSaved]
+            properties:
+              revision: { type: integer, minimum: 0 }
+              state:
+                anyOf:
+                  - { $ref: '#/components/schemas/StudioState' }
+                  - { type: 'null' }
+              lastSaved: { type: [string, 'null'], format: date-time }
+  requestBodies:
+    Message:
+      required: true
+      content: { application/json: { schema: { type: object, required: [text], properties: { text: { type: string, minLength: 1, maxLength: 1200 } } } } }
+  schemas:
+    StudioState:
+      type: object
+      required: [arrival, progress, lesson, stations, work]
+      properties:
+        arrival: { enum: [ideas, story, controls, done] }
+        storyFinished: { const: true, description: The learner finished the opening story. }
+        activeMission: { enum: [transcript, reading, tickets, hints, toolkit] }
+        progress:
+          type: object
+          additionalProperties:
+            type: array
+            items: { enum: [run, tune, audit] }
+            maxItems: 3
+        lesson:
+          type: object
+          required: [checkpoint, introDone, note, reply, noteSaved, replySaved]
+          properties:
+            checkpoint: { enum: [model, practice, transfer] }
+            introDone: { type: boolean }
+            previouslyCompleted: { type: boolean, description: Local migration flag. Account-backed saves always clear it. }
+            note: { type: string, maxLength: 800 }
+            reply: { type: string, maxLength: 800 }
+            noteSaved: { type: boolean }
+            replySaved: { type: boolean }
+        stations:
+          type: object
+          description: Lesson checkpoints keyed by mission ID
+        work:
+          type: object
+          description: Allowlisted studio controls and activity state keyed by mission ID
+    Account:
+      type: object
+      required: [role, label, accountKey]
+      properties: { role: { enum: [learner, instructor] }, label: { type: string }, accountKey: { type: string, pattern: "^[a-f0-9]{64}$", description: Opaque account identifier for reconnecting local drafts. }, canStartDemoRun: { type: boolean, description: A new isolated learner session is available in this local preview. } }
+    Rule: { enum: [answer, attempt-first] }
+    Text: { type: string, minLength: 1, maxLength: 10000, pattern: '\S' }
+    Action:
+      type: object
+      additionalProperties: false
+      required: [actionId, expectedRevision, contentVersion, intent]
+      properties:
+        actionId: { type: string, pattern: '^[a-zA-Z0-9_-]{1,128}$' }
+        expectedRevision: { type: integer, minimum: 0, maximum: 9007199254740991 }
+        contentVersion: { type: string, minLength: 1, maxLength: 80 }
+        intent: { $ref: '#/components/schemas/Intent' }
+      allOf:
+        - if: { properties: { contentVersion: { const: '3' }, intent: { properties: { type: { const: attachEvidence } } } } }
+          then: { properties: { intent: { properties: { evidence: { enum: [organizer, draft, visitor] } } } } }
+
+    Intent:
+      type: object
+      required: [type, stepId]
+      properties:
+        stepId: { type: string, minLength: 1, maxLength: 120 }
+      unevaluatedProperties: false
+      oneOf:
+        - properties: { type: { const: inspectEvidence }, evidence: { enum: [practice, fresh] } }
+          required: [evidence]
+        - properties: { type: { const: attachEvidence }, evidence: { enum: [organizer, draft, visitor, seven, nine, five] } }
+          required: [evidence]
+        - properties: { type: { const: selectChoice }, selected: { type: integer, minimum: 0 } }
+          required: [selected]
+        - properties: { type: { enum: [writeNote, predict, reviseAttempt] }, text: { $ref: '#/components/schemas/Text' } }
+          required: [text]
+        - properties: { type: { const: selectRule }, rule: { $ref: '#/components/schemas/Rule' } }
+          required: [rule]
+        - properties: { type: { const: fileFirstAttempt }, rule: { $ref: '#/components/schemas/Rule' }, text: { $ref: '#/components/schemas/Text' } }
+          required: [rule, text]
+        - properties: { type: { enum: [reveal, advance, requestHint, runReplay] } }
+    Checkpoint:
+      type: object
+      required: [questId, contentVersion, revision, lastSaved, state]
+      allOf:
+        - if: { properties: { contentVersion: { const: '3' } } }
+          then:
+            properties:
+              state:
+                properties:
+                  entries: { type: object, additionalProperties: { $ref: '#/components/schemas/Entry' } }
+      properties:
+        questId: { const: w01 }
+        contentVersion: { type: string }
+        revision: { type: integer, minimum: 0 }
+        lastSaved: { type: [string, 'null'], format: date-time }
+        state:
+          type: object
+          required: [index, entries]
+          properties:
+            index: { type: integer, minimum: 0, description: Index into the versioned scene list, or the list length on completion }
+            entries: { type: object, additionalProperties: { type: object }, description: Earlier receipt retries preserve the original case-specific fields. }
+        archivedVersions:
+          type: array
+          description: Earlier kit-case records available to this learner, newest first
+          items: { enum: ['1', '2'] }
+        unlocked:
+          type: object
+          description: Omitted until the independent first attempt is committed. Replay text appears after running the selected rule.
+          required: [feedback]
+          properties: { feedback: { type: string }, replay: { type: string } }
+    Entry:
+      type: object
+      properties:
+        inspected: { type: array, uniqueItems: true, items: { enum: [practice, fresh] } }
+        evidence: { enum: [organizer, draft, visitor] }
+        rule: { $ref: '#/components/schemas/Rule' }
+        prediction: { type: string }
+        replay: { type: boolean }
+        selected: { type: integer }
+        revealed: { type: boolean }
+        first: { type: string }
+        revision: { type: string }
+        text: { type: string }
+        hints: { type: integer }
+        sent: { type: boolean }
+        responded: { type: boolean }
+        reflection: { type: string }
+    StageSummary:
+      type: object
+      required: [stage, stages, complete, lastSaved]
+      properties:
+        stage: { type: [string, 'null'] }
+        stages: { type: object, additionalProperties: { enum: [complete, in-progress, not-started] } }
+        complete: { type: boolean }
+        lastSaved: { type: string, format: date-time }
+    Bottle:
+      type: object
+      required: [id, text]
+      properties: { id: { type: string }, text: { type: string }, label: { type: string } }
+    Exchange:
+      type: object
+      required: [own, next, replies, responded]
+      properties:
+        own: { oneOf: [{ $ref: '#/components/schemas/Bottle' }, { type: 'null' }] }
+        next: { oneOf: [{ $ref: '#/components/schemas/Bottle' }, { type: 'null' }] }
+        replies:
+          type: array
+          items: { type: object, required: [label, text], properties: { label: { type: string }, text: { type: string } } }
+        sentReplies:
+          description: On a shelf read, the learner’s own visible replies to classmates or the example, in the order sent
+          type: array
+          items: { type: object, required: [text], properties: { text: { type: string } } }
+        responded: { type: boolean }

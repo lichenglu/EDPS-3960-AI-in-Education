@@ -1,0 +1,107 @@
+@font-face {
+  font-family: Nunito;
+  src: url('/assets/fonts/nunito.woff2') format('woff2');
+  font-weight: 200 1000;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/assets/fonts/atkinson-hyperlegible-next.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: #5b462f;
+  background: #f7f3df;
+  background-image: radial-gradient(#d9cfad 1px, transparent 1px);
+  background-size: 16px 16px;
+  font: 1.08rem/1.65 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+}
+main {
+  max-width: 73ch;
+  margin: clamp(.5rem, 3vw, 2rem) auto 3rem;
+  padding: clamp(1.1rem, 4vw, 3.4rem);
+  border: 1px solid #c8b99e;
+  border-radius: 1.5rem;
+  background: #fffaf0;
+  box-shadow: 0 5px 0 #bca77e44;
+}
+header { padding-bottom: 1.2rem; border-bottom: 1px dashed #ac997a; }
+header p:first-child {
+  margin: 0;
+  color: #596842;
+  font-weight: 750;
+  font-size: .92rem;
+}
+h1, h2, h3 {
+  font-family: Nunito, ui-rounded, system-ui, sans-serif;
+  color: #794f27;
+  line-height: 1.2;
+}
+h1 { margin: .25em 0; font-size: clamp(2.4rem, 8vw, 3.75rem); font-weight: 900; }
+h2 {
+  margin: 2rem 0 1rem;
+  display: inline-block;
+  max-width: 100%;
+  background: #deefd8;
+  border-radius: 1.1rem;
+  padding: .35rem .8rem;
+  font-size: clamp(1.45rem, 5vw, 1.8rem);
+  font-weight: 850;
+}
+#practice h2 { background: #ffe5a8; }
+#transfer h2 { background: #f8d9c1; }
+h3 { margin: 1.25rem 0 .5rem; font-size: 1.3rem; font-weight: 850; }
+a { color: #315f4f; text-underline-offset: .18em; overflow-wrap: anywhere; }
+a:focus-visible { outline: 3px solid #794f27; outline-offset: 3px; }
+nav { line-height: 2; }
+nav a { font-weight: 750; }
+blockquote {
+  margin-inline: 0;
+  padding: .15rem 1rem;
+  border-inline-start: .25rem solid #ae8650;
+  background: #f7f0da;
+}
+ol, ul { padding-inline-start: 1.55rem; }
+li + li { margin-top: .65em; }
+@media (max-width: 430px) {
+  main { margin: 0; border: 0; border-radius: 0; }
+}
+@media print {
+  body, main { background: white; color: #211e19; }
+  body { font: 10.5pt/1.48 'Atkinson Hyperlegible Next', sans-serif; }
+  main { max-width: none; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+  header { border-bottom: 1pt solid #a29a8e; }
+  nav { display: none; }
+  h1 { font-size: 24pt; }
+  h2 { display: block; margin: 14pt 0 6pt; font-size: 16pt; }
+  h3 { margin: 10pt 0 4pt; font-size: 13pt; }
+  h1, h2, h3 { color: #211e19; break-after: avoid; }
+  section h2, #practice h2, #transfer h2 { padding: 0; background: transparent; }
+  blockquote, li { break-inside: avoid; }
+  blockquote { padding-inline: 8pt; background: transparent; }
+  a { color: inherit; }
+  #guided-notes { break-before: page; }
+}
+.crew-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; padding: 0; list-style: none; }
+.crew-grid li { margin: 0; min-width: 0; }
+.crew-grid h3 { margin: 0; }
+.crew-grid strong { font-size: .9em; }
+.crew-grid p { margin: .22rem 0; line-height: 1.35; }
+#references p { margin: .2rem 0; }
+#references li { scroll-margin-top: 1rem; }
+@media (max-width: 650px) { .crew-grid { grid-template-columns: 1fr; } }
+@media print {
+  .crew-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9pt 16pt; }
+  .crew-grid h3 { margin-top: 0; }
+  #crew { break-inside: avoid; }
+  #references { break-before: page; font-size: 10pt; line-height: 1.32; }
+  #references p { margin: 1pt 0; }
+  #references li + li { margin-top: 5.5pt; }
+  #references .ref-links { line-height: 1.18; }
+  .ref-links a { display: block; }
+  .ref-links a::after { content: ' (' attr(href) ')'; font-size: 9pt; overflow-wrap: anywhere; }
+}

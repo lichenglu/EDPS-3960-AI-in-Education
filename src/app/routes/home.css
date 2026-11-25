@@ -1,0 +1,69 @@
+.course-home {
+  display: grid;
+  align-content: start;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  width: min(100%, 72rem);
+  margin-inline: auto;
+}
+
+.course-heading {
+  display: grid;
+  justify-items: center;
+  padding-block: 0.35rem 0;
+}
+
+.course-heading h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.04em;
+}
+
+.course-heading .ribbon-heading {
+  row-gap: 0.7rem;
+}
+
+.quest-map h2 {
+  margin-block-end: 0.6rem;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.quest-map ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.quest-map li {
+  display: grid;
+  align-content: start;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--island-line);
+  border-radius: 14px;
+  background: var(--island-parchment);
+}
+
+.quest-map li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 800;
+}
+
+.quest-map li span {
+  color: var(--island-muted);
+}
+
+.week-card-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  font-size: 0.92rem;
+}
+
+.course-heading > .language-select {
+  justify-self: end;
+}

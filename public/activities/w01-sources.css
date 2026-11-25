@@ -1,0 +1,13 @@
+.source-marker { font-size: .76em; line-height: 0; vertical-align: super; font-weight: 800; }
+.source-marker a { color: #075950; text-decoration: underline; text-underline-offset: .12em; padding-inline: .08em; }
+.source-marker a:focus-visible, .source-dialog :focus-visible { outline: 2px solid #715632; outline-offset: 2px; }
+.source-dialog { box-sizing: border-box; width: min(32rem, calc(100% - 2rem)); max-height: 85vh; overflow: auto; color: #382d20; background: #fffaf0; border: 2px solid #715632; border-radius: 20px; padding: clamp(1rem,3vw,1.65rem); font: inherit; }
+.source-dialog::backdrop { background: #382d2075; }
+.source-dialog h2 { display: block; background: none; color: #794f27; font-weight: 800; font-family: inherit; font-size: 1.35rem; line-height: 1.25; padding: 0; margin: 0 0 .8rem; }
+.source-dialog p { margin: .65rem 0; overflow-wrap: anywhere; }
+.source-dialog ul { padding: 0; margin: .5rem 0; list-style: none; }
+.source-dialog li { margin: 0; }
+.source-dialog a { display: inline-flex; min-height: 44px; align-items: center; color: #075950; font-weight: 700; }
+.source-dialog button { min-height: 44px; border-radius: 50px; padding: .5rem 1.1rem; color: #382d20; background: #19c8b9; border: 1px solid #715632; font: inherit; font-weight: 750; cursor: pointer; }
+@media print { .source-dialog, .source-dialog::backdrop { display: none !important; } .source-marker a { color: inherit; } }
+@media print { .source-marker a:focus-visible { outline: none; } }

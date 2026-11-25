@@ -1,0 +1,37 @@
+{
+  "chenglu": {
+    "name": "Chenglu",
+    "role": "Learning center director",
+    "species": "Giant panda"
+  },
+  "yinqi": {
+    "name": "Yinqi",
+    "role": "Peer tutor",
+    "species": "Red panda"
+  },
+  "eunseo": {
+    "name": "Eunseo",
+    "role": "Workshop volunteer",
+    "species": "Golden snub-nosed monkey"
+  },
+  "guimin": {
+    "name": "Guimin",
+    "role": "Conversation guide",
+    "species": "Crested ibis"
+  },
+  "xinlin": {
+    "name": "Xinlin",
+    "role": "Privacy reviewer",
+    "species": "Chinese pangolin"
+  },
+  "gokhan": {
+    "name": "Gokhan",
+    "role": "Visiting workshop host",
+    "species": "Capybara"
+  },
+  "pip": {
+    "name": "Pip",
+    "role": "AI tutor",
+    "species": null
+  }
+}
