@@ -1,0 +1,232 @@
+.intro-film {
+  --film-surface: #171c24;
+  --film-stage: #0c1119;
+  --film-text: #f4eee2;
+  --film-muted: #c3cbd3;
+  --film-rule: #3d4856;
+  --film-focus: #b8d6f5;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.intro-film-heading,
+.intro-film-controls,
+.intro-film-transcript,
+.intro-film-sources {
+  padding: 0.75rem clamp(0.65rem, 3%, 1.2rem);
+}
+
+.intro-film:not(.intro-film--text) > .intro-film-heading {
+  border-radius: 7px 7px 0 0;
+  background: var(--film-surface);
+  color: var(--film-text);
+}
+
+.intro-film:not(.intro-film--text) > .intro-film-heading p {
+  color: var(--film-muted);
+}
+
+.intro-film-screen {
+  min-inline-size: 0;
+  border-radius: 0 0 7px 7px;
+  background: var(--film-surface);
+  color: var(--film-text);
+}
+
+.intro-film-heading h3,
+.intro-film-heading p,
+.intro-film-sources h4,
+.intro-film-transcript h4 {
+  margin: 0;
+}
+
+.intro-film-heading p {
+  margin-block-start: 0.3rem;
+}
+
+.intro-film-frame {
+  margin: 0;
+  background: var(--film-stage);
+  color: var(--film-text);
+}
+
+.intro-film-poster {
+  display: grid;
+  place-items: center;
+  min-block-size: 10rem;
+  aspect-ratio: 16 / 9;
+  padding: 1rem;
+  text-align: center;
+}
+
+.intro-film-scene {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  padding: 0.38rem clamp(0.65rem, 3%, 1.2rem);
+}
+
+.intro-film-scene span {
+  color: var(--film-muted);
+  font-size: 0.85rem;
+}
+
+.intro-film-caption {
+  display: grid;
+  align-items: center;
+  min-block-size: 2.85rem;
+  margin: 0;
+  padding: 0.45rem clamp(0.65rem, 3%, 1.2rem);
+  border-block-start: 1px solid #293444;
+  background: #101723;
+  color: var(--film-text);
+  line-height: 1.42;
+}
+
+.intro-film-controls {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.intro-film-buttons,
+.intro-film-preferences,
+.intro-film-seek {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+}
+
+.intro-film-buttons button {
+  min-block-size: 44px;
+  padding: 0.34rem 0.68rem;
+  border: 1px solid var(--film-rule);
+  border-radius: 5px;
+  background: #212a36;
+  color: var(--film-text);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.intro-film-buttons button.intro-film-play {
+  border-color: #ece8dc;
+  background: #ece8dc;
+  color: #18212b;
+}
+
+.intro-film-buttons button.intro-film-fullscreen {
+  margin-inline-start: auto;
+}
+
+.intro-film-buttons button:hover:not(:disabled, .intro-film-play) {
+  background: #354254;
+}
+
+.intro-film-buttons button.intro-film-play:hover {
+  background: #fffaf0;
+}
+
+.intro-film-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.intro-film-screen :is(button, input):focus-visible {
+  outline: 3px solid var(--film-focus);
+  outline-offset: 2px;
+}
+
+.intro-film :is(summary, a):focus-visible {
+  outline: 3px solid #345775;
+  outline-offset: 2px;
+}
+
+.intro-film-seek input {
+  flex: 1 1 8rem;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  margin: 0;
+  padding: 0;
+  accent-color: #bfd5ec;
+}
+
+.intro-film-seek span {
+  color: var(--film-muted);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.intro-film-preferences label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-block-size: 44px;
+  padding-inline: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.intro-film-preferences input {
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  margin: 0;
+  accent-color: #bfd5ec;
+}
+
+.intro-film-voice {
+  margin: 0;
+  color: var(--film-muted);
+  font-size: 0.82rem;
+}
+
+.intro-film-transcript,
+.intro-film-sources {
+  border-block-start: 1px solid #d2c9b6;
+}
+
+.intro-film-transcript summary {
+  padding-block: 0.35rem;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.intro-film-transcript-list,
+.intro-film-sources ul {
+  margin-block: 0.45rem 0;
+  padding-inline-start: 1.45rem;
+}
+
+.intro-film-transcript-list li + li {
+  margin-block-start: 0.8rem;
+}
+
+.intro-film-transcript-list p {
+  margin-block: 0.25rem 0;
+}
+
+.intro-film-description > span:first-child {
+  font-weight: 750;
+}
+
+.intro-film-screen:fullscreen {
+  overflow: auto;
+  border-radius: 0;
+  padding: clamp(0.5rem, 2.5vmin, 1.25rem);
+  background: var(--film-stage);
+  color-scheme: dark;
+}
+
+.intro-film-screen:fullscreen::backdrop {
+  background: var(--film-stage);
+}
+
+.intro-film-screen:fullscreen > * {
+  inline-size: min(100%, calc(max(12rem, 100dvh - 14rem) * 1.7778));
+  margin-inline: auto;
+}
+
+.intro-film-screen:fullscreen .intro-film-controls {
+  background: var(--film-surface);
+}

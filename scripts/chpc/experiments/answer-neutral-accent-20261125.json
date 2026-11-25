@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "comparison_variant": "answer-neutral-accent-20261125",
+  "text": "Could a computer tell how Sam figured out an answer? An early teaching machine could reveal a prepared answer.",
+  "listening_target": "Compare American English pronunciation while preserving the reference speaker’s warmth and energy. Listen for the unstressed final syllable of “answer.”",
+  "variants": [
+    {
+      "id": "answer-current",
+      "instruct": "Speak warmly and energetically, like sharing an exciting idea with a friend. Lively expression, clear pronunciation, easygoing phrasing, and natural pauses. Keep the reference speaker's voice and accent."
+    },
+    {
+      "id": "answer-neutral-clear",
+      "instruct": "Speak English with clear, neutral American English pronunciation. Preserve the reference speaker's vocal identity, timbre, pitch, and warmth. Use smooth, natural English vowels and consonants. Say answer naturally, with a short, unstressed final syllable and a light American r sound. Speak warmly and energetically, like sharing an exciting idea with a friend, with easygoing phrasing and natural pauses."
+    },
+    {
+      "id": "answer-neutral-casual",
+      "instruct": "Use relaxed, conversational American English pronunciation and natural American English rhythm. Keep the reference speaker's distinctive vocal tone, pitch, and personality. Speak warmly and with lively, friendly energy. Keep word endings light and unstressed, especially the final syllable of answer. Use clear pronunciation and comfortable pauses, like a natural conversation with a friend."
+    }
+  ]
+}

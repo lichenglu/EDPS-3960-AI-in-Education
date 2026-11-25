@@ -50,6 +50,14 @@ Deliverable or revision to review
 Tests run, results, and open questions
 ```
 
+## References for content and activity design
+
+When drafting or revising lessons, narration, worked examples, discussion prompts, or learning activities, consider the [podcast reference library](<../Podcast Research/README.md>) alongside the syllabus, assigned readings, and relevant primary research. Follow the [course workspace source guidance](../AGENTS.md#podcast-reference-library). Choose sources for their fit with the learning objective; a lesson or activity does not need a podcast reference when other sources are more useful.
+
+- Consult the [example bank](<../Podcast Research/EXAMPLE-BANK.md>) and relevant episode notes for concrete situations discussed by the speakers. Use the [course content plan](<../Podcast Research/COURSE-CONTENT-PLAN.md>) and [original content drafts](<../Podcast Research/CONTENT-DRAFTS.md>) as starting points for activity design.
+- Have the author and proofreader check the [transcript catalog](<../Podcast Research/TRANSCRIPT-CATALOG.md>) and original source before attributing a guest example. Preserve the evidence level and distinguish reported examples from our original adaptations. Support causal or numerical claims with underlying research.
+- When podcast material informs a draft, include its episode/example ID, original source URL, and timestamp or text locator in the handoff. Record the source in the week's `references.ts` when it appears in course content.
+
 ## I Do, We Do, and You Do
 
 Define the learning objective and what students will do to show it before drafting a quest. Give each stage a distinct purpose and use one main hands-on case for the concept. Keep accessibility supports available throughout.
